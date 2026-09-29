@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Roblox Followers</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      font-family: Inter, Arial, sans-serif;
+      background: #0b0b10;
+      color: #fff;
+    }
+    .card {
+      width: min(92%, 520px);
+      padding: 42px 32px;
+      text-align: center;
+      border: 1px solid #242431;
+      border-radius: 24px;
+      background: #12121a;
+      box-shadow: 0 20px 70px rgba(0,0,0,.45);
+    }
+    h1 { margin: 0 0 10px; font-size: 38px; letter-spacing: -1px; }
+    p { color: #a9a9b7; line-height: 1.5; }
+    button {
+      width: 100%;
+      padding: 15px 18px;
+      margin-top: 18px;
+      border: 0;
+      border-radius: 12px;
+      background: #fff;
+      color: #111;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    button:hover { opacity: .9; }
+    button.secondary { background: #242431; color: #fff; }
+    #result {
+      display: none;
+      margin-top: 20px;
+      text-align: left;
+    }
+    textarea {
+      width: 100%;
+      min-height: 130px;
+      resize: vertical;
+      padding: 14px;
+      border-radius: 12px;
+      border: 1px solid #30303d;
+      background: #0b0b10;
+      color: #fff;
+      outline: none;
+    }
+    .small { font-size: 13px; }
+    #status { min-height: 22px; margin-top: 14px; font-size: 14px; }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <h1>Roblox Followers</h1>
+    <p>
+      Click below to read your clipboard. Your browser will ask for permission.
+      Nothing is sent anywhere unless you explicitly confirm it.
+    </p>
+
+    <button id="readBtn">Read My Clipboard</button>
+
+    <section id="result">
+      <p class="small">Clipboard contents:</p>
+      <textarea id="clipboardText" readonly></textarea>
+      <button id="sendBtn">Confirm & Send</button>
+      <button id="cancelBtn" class="secondary">Cancel</button>
+    </section>
+
+    <div id="status"></div>
+  </main>
+
+<script>
+  // Optional: set this to your own HTTPS endpoint after you create one.
+  // Example: "https://example.com/api/clipboard"
+  const SEND_ENDPOINT = "";
+
+  const readBtn = document.getElementById("readBtn");
+  const sendBtn = document.getElementById("sendBtn");
+  const cancelBtn = document.getElementById("cancelBtn");
+  const result = document.getElementById("result");
+  const clipboardText = document.getElementById("clipboardText");
+  const status = document.getElementById("status");
+
+  readBtn.addEventListener("click", async () => {
+    status.textContent = "";
+    try {
+      if (!navigator.clipboard || !navigator.clipboard.readText) {
+        throw new Error("Clipboard access is not supported by this browser.");
+      }
+
+      const text = await navigator.clipboard.readText();
+      clipboardText.value = text;
+      result.style.display = "block";
+      status.textContent = "Clipboard read successfully. Review it before sending.";
+    } catch (err) {
+      status.textContent =
+        "Clipboard access was not granted. Please allow access and try again.";
+    }
+  });
+
+  cancelBtn.addEventListener("click", () => {
+    clipboardText.value = "";
+    result.style.display = "none";
+    status.textContent = "Nothing was sent.";
+  });
+
+  sendBtn.addEventListener("click", async () => {
+    const text = clipboardText.value;
+
+    if (!text) {
+      status.textContent = "There is nothing to send.";
+      return;
+    }
+
+    if (!SEND_ENDPOINT) {
+      status.textContent =
+        "Demo mode: the text was NOT sent anywhere. Add your own HTTPS endpoint to enable sending.";
+      return;
+    }
+
+    sendBtn.disabled = true;
+    status.textContent = "Sending...";
+
+    try {
+      const response = await fetch(SEND_ENDPOINT, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ clipboardText: text })
+      });
+
+      if (!response.ok) throw new Error("Request failed.");
+
+      status.textContent = "Sent successfully.";
+    } catch (err) {
+      status.textContent = "The message could not be sent.";
+    } finally {
+      sendBtn.disabled = false;
+    }
+  });
+</script>
+</body>
+</html>
