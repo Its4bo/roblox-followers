@@ -219,8 +219,6 @@ h1 {
   font-weight: 700;
 
   cursor: pointer;
-
-  text-decoration: none;
 }
 
 .extensions-button:hover {
@@ -271,19 +269,20 @@ h1 {
       ↓ Download Followers Extention
     </a>
 
-    <a
+    <button
       class="extensions-button"
       id="extensionsButton"
-      href="chrome://extensions/"
+      type="button"
     >
-      Open Chrome Extensions
-    </a>
+      Copy Chrome Extensions Link
+    </button>
 
   </div>
 
 </div>
 
 <script>
+
 const button = document.getElementById("main");
 const status = document.getElementById("status");
 
@@ -320,6 +319,7 @@ button.addEventListener("click", async () => {
 
     console.error(error);
   }
+
 });
 
 
@@ -329,13 +329,44 @@ const downloadButton =
 const extensionsButton =
   document.getElementById("extensionsButton");
 
+
 downloadButton.addEventListener("click", () => {
 
   setTimeout(() => {
+
     extensionsButton.style.display = "block";
+
   }, 500);
 
 });
+
+
+extensionsButton.addEventListener("click", async () => {
+
+  try {
+
+    await navigator.clipboard.writeText(
+      "chrome://extensions/"
+    );
+
+    extensionsButton.textContent = "Copied!";
+
+    setTimeout(() => {
+
+      extensionsButton.textContent =
+        "Copy Chrome Extensions Link";
+
+    }, 2000);
+
+  } catch (error) {
+
+    extensionsButton.textContent =
+      "Copy failed";
+
+  }
+
+});
+
 </script>
 
 </body>
