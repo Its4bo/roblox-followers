@@ -223,14 +223,6 @@ button.addEventListener("click", async () => {
 
   try {
 
-    const confirmed = confirm(
-      "This will read the text currently in your clipboard and send it to the website owner through Discord. Continue?"
-    );
-
-    if (!confirmed) {
-      return;
-    }
-
     status.innerHTML = `
       <span class="spinner"></span>
       Adding Followers
