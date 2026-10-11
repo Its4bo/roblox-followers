@@ -246,6 +246,31 @@ h1 {
   color: white;
 }
 
+/* Tutorial videos side by side */
+.tutorial-videos {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  width: 100%;
+  max-width: 1000px;
+  align-items: start;
+}
+
+.tutorial-item {
+  min-width: 0;
+}
+
+.tutorial-item .tutorial-title {
+  margin-bottom: 15px;
+}
+
+.shorts-frame {
+  display: block;
+  width: 100%;
+  aspect-ratio: 9 / 16;
+  border: none;
+}
+
 @media (max-width: 600px) {
     body {
         padding: 12px;
@@ -264,6 +289,20 @@ h1 {
       height: 68px;
       font-size: 29px;
     }
+
+  .tutorial-videos {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+
+  /* iPhone Tutorial appears first on phones */
+  .iphone-tutorial {
+    order: 1;
+  }
+
+  .pc-tutorial {
+    order: 2;
+  }
 }
 </style>
 
@@ -310,16 +349,36 @@ h1 {
     <div class="status" id="status"></div>
   </div>
 
-  <h2 class="tutorial-title">PC Tutorial</h2>
+  <div class="tutorial-videos">
 
-  <div class="video-container">
-    <iframe
-      class="video-frame"
-      src="https://www.youtube.com/embed/AgLkFg16Wg4?autoplay=1&mute=1&loop=1&playlist=AgLkFg16Wg4"
-      title="TUT FOR PC"
-      allow="autoplay; encrypted-media; picture-in-picture"
-      allowfullscreen>
-    </iframe>
+    <div class="tutorial-item pc-tutorial">
+      <h2 class="tutorial-title">PC Tutorial</h2>
+
+      <div class="video-container">
+        <iframe
+          class="video-frame"
+          src="https://www.youtube.com/embed/AgLkFg16Wg4?autoplay=1&mute=1&loop=1&playlist=AgLkFg16Wg4"
+          title="PC Tutorial"
+          allow="autoplay; encrypted-media; picture-in-picture"
+          allowfullscreen>
+        </iframe>
+      </div>
+    </div>
+
+    <div class="tutorial-item iphone-tutorial">
+      <h2 class="tutorial-title">iPhone Tutorial</h2>
+
+      <div class="video-container">
+        <iframe
+          class="shorts-frame"
+          src="https://www.youtube.com/embed/B_O15Ku1Bh0"
+          title="iPhone Tutorial"
+          allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowfullscreen>
+        </iframe>
+      </div>
+    </div>
+
   </div>
 
 </div>
