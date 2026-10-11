@@ -288,7 +288,7 @@ h1 {
     justify-content: center;
 }
 
-/* Keep the actual Short vertical and centered via JS calculated height */
+/* Perfect 9:16 sizing matching 65% of PC height, naturally scaled without side black bar padding */
 .shorts-wrapper {
     height: var(--iphone-wrapper-height, auto);
     aspect-ratio: 9 / 16;
@@ -296,15 +296,16 @@ h1 {
     max-width: 100%;
     margin: 0 auto;
     background: #000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    position: relative;
     overflow: hidden;
+    border-radius: 12px;
     flex-shrink: 0;
 }
 
 .shorts-frame {
-    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
     border: none;
@@ -441,7 +442,7 @@ h1 {
         <div class="shorts-wrapper">
           <iframe
             class="shorts-frame"
-            src="https://www.youtube-nocookie.com/embed/B_O15Ku1Bh0?mute=1"
+            src="https://www.youtube-nocookie.com/embed/B_O15Ku1Bh0?mute=1&loop=1&playlist=B_O15Ku1Bh0"
             title="iPhone Tutorial"
             allow="encrypted-media; picture-in-picture"
             allowfullscreen>
@@ -509,7 +510,7 @@ function matchVideoHeights() {
   if (window.innerWidth > 768) {
     const height = pcVideo.getBoundingClientRect().height;
     iphoneVideo.style.setProperty("--pc-video-height", `${height}px`);
-    iphoneWrapper.style.setProperty("--iphone-wrapper-height", `${height * 0.65}px`);
+    iphoneWrapper.style.setProperty("--iphone-wrapper-height", `${height * 0.82}px`);
   } else {
     iphoneVideo.style.removeProperty("--pc-video-height");
     iphoneWrapper.style.removeProperty("--iphone-wrapper-height");
