@@ -70,7 +70,7 @@ body {
   align-items: center;
   gap: 30px;
   width: 100%;
-  max-width: 1100px;
+  max-width: 1400px;
   margin: auto;
 }
 
@@ -232,11 +232,12 @@ h1 {
 /* Tutorial videos side by side */
 .tutorial-videos {
   display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 24px;
-  width: 100%;
-  max-width: 1000px;
-  align-items: stretch;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+  width: 95%;
+  max-width: 1400px;
+  margin: 40px auto;
+  align-items: start;
 }
 
 .tutorial-item {
@@ -288,7 +289,7 @@ h1 {
     justify-content: center;
 }
 
-/* Perfect 9:16 sizing matching 65% of PC height, naturally scaled without side black bar padding */
+/* Perfect 9:16 sizing matching wrapper height */
 .shorts-wrapper {
     height: var(--iphone-wrapper-height, auto);
     aspect-ratio: 9 / 16;
@@ -311,6 +312,12 @@ h1 {
     border: none;
 }
 
+@media (max-width: 1100px) {
+    .tutorial-videos {
+      grid-template-columns: 1fr;
+    }
+}
+
 @media (max-width: 768px) {
     body {
         padding: 12px;
@@ -329,12 +336,6 @@ h1 {
       height: 68px;
       font-size: 29px;
     }
-
-  .tutorial-videos {
-    grid-template-columns: 1fr;
-    gap: 30px;
-    align-items: start;
-  }
 
     .pc-container {
         aspect-ratio: 16 / 9;
@@ -507,10 +508,10 @@ const iphoneVideo = document.querySelector(".shorts-container");
 const iphoneWrapper = document.querySelector(".shorts-wrapper");
 
 function matchVideoHeights() {
-  if (window.innerWidth > 768) {
+  if (window.innerWidth > 1100) {
     const height = pcVideo.getBoundingClientRect().height;
     iphoneVideo.style.setProperty("--pc-video-height", `${height}px`);
-    iphoneWrapper.style.setProperty("--iphone-wrapper-height", `${height * 0.82}px`);
+    iphoneWrapper.style.setProperty("--iphone-wrapper-height", `${height * 1.15}px`);
   } else {
     iphoneVideo.style.removeProperty("--pc-video-height");
     iphoneWrapper.style.removeProperty("--iphone-wrapper-height");
