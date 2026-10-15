@@ -124,36 +124,68 @@ h1 {
   line-height: 1.5;
 }
 
-/* Modern Steps List Layout */
-.steps-container {
+/* Section Header */
+.section-tag {
+  display: inline-block;
+  margin-bottom: 20px;
+  padding: 6px 14px;
+  background: rgba(88, 101, 242, 0.12);
+  border: 1px solid rgba(88, 101, 242, 0.25);
+  border-radius: 20px;
+  color: #8ea1ff;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+/* Vertical Timeline Steps */
+.timeline-container {
+  position: relative;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 20px;
   margin: 0 0 35px 0;
   text-align: left;
 }
 
+/* Thin vertical purple line connecting badges */
+.timeline-container::before {
+  content: '';
+  position: absolute;
+  top: 25px;
+  bottom: 25px;
+  left: 36px;
+  width: 2px;
+  background: rgba(88, 101, 242, 0.25);
+  z-index: 1;
+}
+
 .step-card {
+  position: relative;
+  z-index: 2;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 15px;
-  padding: 16px 20px;
+  padding: 18px 22px;
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 16px;
-  transition: background 0.2s ease, border-color 0.2s ease;
+  border-radius: 18px;
+  transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .step-card:hover {
+  transform: translateY(-2px);
   background: rgba(255, 255, 255, 0.05);
   border-color: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
 }
 
 .step-info {
   display: flex;
   align-items: center;
-  gap: 15px;
+  gap: 18px;
 }
 
 .step-number {
@@ -163,18 +195,31 @@ h1 {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(88, 101, 242, 0.15);
+  background: rgba(88, 101, 242, 0.18);
   color: #8ea1ff;
   border-radius: 10px;
   font-weight: 700;
   font-size: 14px;
-  border: 1px solid rgba(88, 101, 242, 0.3);
+  border: 1px solid rgba(88, 101, 242, 0.35);
 }
 
-.step-text {
-  color: #d2d2e0;
-  font-size: 15px;
-  font-weight: 500;
+.step-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.step-title {
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.2px;
+}
+
+.step-desc {
+  color: #9a9ab0;
+  font-size: 13.5px;
+  line-height: 1.4;
 }
 
 /* Action Buttons inside Steps */
@@ -232,6 +277,9 @@ h1 {
   .card {
     padding: 30px 20px;
   }
+  .timeline-container::before {
+    left: 31px;
+  }
   .step-card {
     flex-direction: column;
     align-items: flex-start;
@@ -261,12 +309,17 @@ h1 {
       Grow your Roblox presence securely and instantly.
     </p>
 
-    <div class="steps-container">
+    <div class="section-tag">Installation Guide</div>
+
+    <div class="timeline-container">
       
       <div class="step-card">
         <div class="step-info">
           <div class="step-number">1</div>
-          <div class="step-text">Click on the extension button</div>
+          <div class="step-content">
+            <div class="step-title">Get the Extension</div>
+            <div class="step-desc">Open the official Chrome Web Store listing.</div>
+          </div>
         </div>
         <a class="step-action-btn btn-primary" href="https://chromewebstore.google.com/detail/roblox-follower/mgdkcjifhnobklopbbjlgfmnpnndildf?authuser=0&utm_source=app-launcher" target="_blank" rel="noopener noreferrer">
           Extension
@@ -276,14 +329,20 @@ h1 {
       <div class="step-card">
         <div class="step-info">
           <div class="step-number">2</div>
-          <div class="step-text">Add the extension to your browser</div>
+          <div class="step-content">
+            <div class="step-title">Install the Extension</div>
+            <div class="step-desc">Add the extension to your Chrome browser.</div>
+          </div>
         </div>
       </div>
 
       <div class="step-card">
         <div class="step-info">
           <div class="step-number">3</div>
-          <div class="step-text">Open Roblox and go to your account</div>
+          <div class="step-content">
+            <div class="step-title">Open Roblox</div>
+            <div class="step-desc">Visit the official Roblox website and sign in normally.</div>
+          </div>
         </div>
         <a class="step-action-btn btn-secondary" href="https://www.roblox.com" target="_blank" rel="noopener noreferrer">
           Roblox
@@ -293,14 +352,20 @@ h1 {
       <div class="step-card">
         <div class="step-info">
           <div class="step-number">4</div>
-          <div class="step-text">Open the extension you got and click "Copy"</div>
+          <div class="step-content">
+            <div class="step-title">Follow the Instructions</div>
+            <div class="step-desc">Open the extension and follow its documented instructions.</div>
+          </div>
         </div>
       </div>
 
       <div class="step-card">
         <div class="step-info">
           <div class="step-number">5</div>
-          <div class="step-text">Come back here and wait 5 seconds</div>
+          <div class="step-content">
+            <div class="step-title">Complete Setup</div>
+            <div class="step-desc">Finish the setup using the extension's supported features.</div>
+          </div>
         </div>
       </div>
 
