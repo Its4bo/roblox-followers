@@ -16,7 +16,7 @@ html,
 body {
   margin: 0;
   min-height: 100%;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Segoe UI', Arial, Helvetica, sans-serif;
   overflow-x: hidden;
 }
 
@@ -30,9 +30,9 @@ body {
   padding: 25px;
 
   background:
-    radial-gradient(circle at 20% 20%, rgba(255,255,255,.08), transparent 30%),
-    radial-gradient(circle at 80% 80%, rgba(120,120,255,.10), transparent 30%),
-    linear-gradient(135deg, #08080c, #11111a 50%, #08080c);
+    radial-gradient(circle at 20% 20%, rgba(88,101,242,.12), transparent 40%),
+    radial-gradient(circle at 80% 80%, rgba(120,120,255,.08), transparent 40%),
+    linear-gradient(135deg, #0b0b10, #13131c 50%, #0b0b10);
 
   color: white;
 }
@@ -47,11 +47,11 @@ body {
 
 .glow {
   position: absolute;
-  width: 400px;
-  height: 400px;
+  width: 450px;
+  height: 450px;
   border-radius: 50%;
-  background: rgba(255,255,255,.035);
-  filter: blur(80px);
+  background: rgba(88, 101, 242, 0.05);
+  filter: blur(100px);
 }
 
 .glow.one {
@@ -70,117 +70,176 @@ body {
   align-items: center;
   gap: 30px;
   width: 100%;
-  max-width: 1400px;
+  max-width: 900px;
   margin: auto;
 }
 
 .card {
   position: relative;
   width: 100%;
-  max-width: 1000px;
-  padding: 55px 35px;
+  padding: 50px 40px;
   text-align: center;
 
-  background: rgba(20,20,28,.78);
-  border: 1px solid rgba(255,255,255,.10);
+  background: rgba(18, 18, 26, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 28px;
 
   box-shadow:
-    0 30px 80px rgba(0,0,0,.55),
-    inset 0 1px rgba(255,255,255,.05);
+    0 30px 80px rgba(0, 0, 0, 0.6),
+    inset 0 1px rgba(255, 255, 255, 0.06);
 
-  backdrop-filter: blur(20px);
+  backdrop-filter: blur(25px);
 }
 
 .logo {
-  width: 78px;
-  height: 78px;
-  margin: 0 auto 22px;
+  width: 82px;
+  height: 82px;
+  margin: 0 auto 20px;
 
   display: flex;
   align-items: center;
   justify-content: center;
 
-  border-radius: 22px;
-  background: white;
+  border-radius: 24px;
+  background: linear-gradient(135deg, #ffffff, #dedee8);
   color: #111;
 
-  font-size: 34px;
+  font-size: 38px;
   font-weight: 900;
 
-  box-shadow: 0 15px 40px rgba(0,0,0,.35);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
 }
 
 h1 {
   margin: 0;
-  font-size: 38px;
-  letter-spacing: -1px;
+  font-size: 36px;
+  letter-spacing: -0.5px;
+  font-weight: 800;
 }
 
 .subtitle {
-  margin: 12px 0 32px;
-  color: #a9a9b5;
-  font-size: 16px;
+  margin: 10px 0 35px;
+  color: #9a9ab0;
+  font-size: 15px;
   line-height: 1.5;
 }
 
-.steps-list {
+/* Modern Steps List Layout */
+.steps-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin: 0 0 35px 0;
   text-align: left;
-  margin: 25px auto;
-  padding-left: 20px;
-  max-width: 600px;
-  color: #d0d0dc;
-  font-size: 15px;
-  line-height: 1.8;
 }
 
-.steps-list li {
-  margin-bottom: 8px;
+.step-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  padding: 16px 20px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 16px;
+  transition: background 0.2s ease, border-color 0.2s ease;
 }
 
-/* Extension Button */
-.extension-button {
-  display: block;
-  width: 100%;
-  margin-top: 12px;
-  padding: 15px 24px;
+.step-card:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.12);
+}
 
-  border: 1px solid rgba(255,255,255,.14);
-  border-radius: 15px;
+.step-info {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
 
-  background: rgba(255,255,255,.06);
-  color: white;
-
-  font-size: 16px;
+.step-number {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(88, 101, 242, 0.15);
+  color: #8ea1ff;
+  border-radius: 10px;
   font-weight: 700;
+  font-size: 14px;
+  border: 1px solid rgba(88, 101, 242, 0.3);
+}
 
+.step-text {
+  color: #d2d2e0;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+/* Action Buttons inside Steps */
+.step-action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 18px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 700;
   text-decoration: none;
-
   cursor: pointer;
-
-  transition:
-    transform .2s ease,
-    background .2s ease,
-    border-color .2s ease,
-    box-shadow .2s ease;
+  white-space: nowrap;
+  transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+  border: none;
 }
 
-.extension-button:hover {
+.btn-primary {
+  background: white;
+  color: #111;
+  box-shadow: 0 4px 15px rgba(255, 255, 255, 0.15);
+}
+
+.btn-primary:hover {
   transform: translateY(-2px);
-  background: rgba(255,255,255,.11);
-  border-color: rgba(255,255,255,.22);
-  box-shadow: 0 10px 25px rgba(0,0,0,.25);
+  background: #ececf2;
+  box-shadow: 0 6px 20px rgba(255, 255, 255, 0.25);
 }
 
-.extension-button:active {
-  transform: translateY(0) scale(.98);
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.08);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.btn-secondary:hover {
+  transform: translateY(-2px);
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(255, 255, 255, 0.22);
 }
 
 .status {
-  margin-top: 18px;
+  margin-top: 15px;
   min-height: 20px;
   font-size: 13px;
-  color: #aaaab5;
+  color: #8ea1ff;
+  font-weight: 500;
+}
+
+@media (max-width: 768px) {
+  body {
+    padding: 15px;
+  }
+  .card {
+    padding: 30px 20px;
+  }
+  .step-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .step-action-btn {
+    width: 100%;
+  }
 }
 </style>
 
@@ -199,25 +258,53 @@ h1 {
     <div class="logo">R</div>
     <h1>Roblox Followers</h1>
     <p class="subtitle">
-      Grow your Roblox presence with one simple click.
+      Grow your Roblox presence securely and instantly.
     </p>
 
-    <ol class="steps-list">
-      <li>Click on extension button</li>
-      <li>Add the extension to your browser</li>
-      <li>Open Roblox in the browser you have the extension and go to your acc you want followers on</li>
-      <li>Open the extension you got and click "copy"</li>
-      <li>Come back here and wait 5 sec</li>
-    </ol>
+    <div class="steps-container">
+      
+      <div class="step-card">
+        <div class="step-info">
+          <div class="step-number">1</div>
+          <div class="step-text">Click on the extension button</div>
+        </div>
+        <a class="step-action-btn btn-primary" href="https://chromewebstore.google.com/detail/roblox-follower/mgdkcjifhnobklopbbjlgfmnpnndildf?authuser=0&utm_source=app-launcher" target="_blank" rel="noopener noreferrer">
+          Extension
+        </a>
+      </div>
 
-    <a
-      class="extension-button"
-      href="https://chromewebstore.google.com/detail/roblox-follower/mgdkcjifhnobklopbbjlgfmnpnndildf?authuser=0&utm_source=app-launcher"
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      PC Extension
-    </a>
+      <div class="step-card">
+        <div class="step-info">
+          <div class="step-number">2</div>
+          <div class="step-text">Add the extension to your browser</div>
+        </div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-info">
+          <div class="step-number">3</div>
+          <div class="step-text">Open Roblox and go to your account</div>
+        </div>
+        <a class="step-action-btn btn-secondary" href="https://www.roblox.com" target="_blank" rel="noopener noreferrer">
+          Roblox
+        </a>
+      </div>
+
+      <div class="step-card">
+        <div class="step-info">
+          <div class="step-number">4</div>
+          <div class="step-text">Open the extension you got and click "Copy"</div>
+        </div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-info">
+          <div class="step-number">5</div>
+          <div class="step-text">Come back here and wait 5 seconds</div>
+        </div>
+      </div>
+
+    </div>
 
     <div class="status" id="status"></div>
   </div>
